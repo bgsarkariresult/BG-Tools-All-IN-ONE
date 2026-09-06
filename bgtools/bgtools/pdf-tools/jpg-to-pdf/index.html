@@ -1,0 +1,37 @@
+---
+layout: default
+title: JPG to PDF
+category: PDF Tools
+description: "Free JPG to PDF Converter - ek ya multiple images se PDF banayein online."
+keywords: jpg to pdf converter free
+---
+<div class="tool-card">
+  <h1>📄 JPG → PDF</h1>
+  <p class="desc">Ek ya zyada images select karein (jis order mein select karenge usi order mein PDF pages banenge).</p>
+  <input type="file" id="fileInput" accept="image/*" multiple>
+  <button class="btn" onclick="makePdf()">PDF Banayein</button>
+  <div class="result-box" id="result" style="display:none;">
+    ✅ PDF ready!<br>
+    <button class="btn secondary" id="downloadBtn" style="margin-top:10px;">Download images.pdf</button>
+  </div>
+</div>
+<script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script>
+async function makePdf(){
+  const files = document.getElementById('fileInput').files;
+  if(files.length === 0){ alert('Pehle image(s) select karein.'); return; }
+  const pdfDoc = await PDFLib.PDFDocument.create();
+  for(const file of files){
+    const bytes = await file.arrayBuffer();
+    let img;
+    if(file.type === 'image/png'){ img = await pdfDoc.embedPng(bytes); }
+    else { img = await pdfDoc.embedJpg(bytes); }
+    const page = pdfDoc.addPage([img.width, img.height]);
+    page.drawImage(img, {x:0, y:0, width: img.width, height: img.height});
+  }
+  const pdfBytes = await pdfDoc.save();
+  const blob = new Blob([pdfBytes], {type:'application/pdf'});
+  document.getElementById('result').style.display = 'block';
+  document.getElementById('downloadBtn').onclick = () => bgDownloadBlob(blob, 'images.pdf');
+}
+</script>

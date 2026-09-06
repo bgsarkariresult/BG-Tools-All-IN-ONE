@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% if page.title %}{{ page.title }} | BG Tools{% else %}BG Tools - Free Online Tools{% endif %}</title>
+<meta name="description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
+<meta name="keywords" content="{% if page.keywords %}{{ page.keywords }}{% else %}free online tools, youtube tools, image tools, pdf tools, text tools, calculator{% endif %}">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="{{ page.url | replace:'index.html','' | absolute_url }}">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="{% if page.title %}{{ page.title }} | BG Tools{% else %}BG Tools{% endif %}">
+<meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
+<meta property="og:url" content="{{ page.url | absolute_url }}">
+<meta name="twitter:card" content="summary">
+
+<link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+{% seo %}
+</head>
+<body>
+
+<header class="topbar">
+  <button id="sidebarToggle" class="hamburger" aria-label="Menu">☰</button>
+  <a href="{{ '/' | relative_url }}" class="topbar-brand">🛠️ BG Tools</a>
+  <span class="topbar-tag">100% Free Tools</span>
+</header>
+
+<div class="layout">
+  {% include sidebar.html %}
+
+  <main class="content">
+    <nav class="breadcrumb">
+      <a href="{{ '/' | relative_url }}">Home</a> {% if page.category %} / {{ page.category }} {% endif %} {% if page.title %} / {{ page.title }}{% endif %}
+    </nav>
+
+    {{ content }}
+
+  </main>
+</div>
+
+<footer class="site-footer">
+  <p>&copy; {{ 'now' | date: "%Y" }} BG Tools — Sabhi tools 100% free hain, koi signup ya payment nahi.</p>
+</footer>
+
+<script src="{{ '/assets/js/main.js' | relative_url }}"></script>
+{% if page.extra_js %}<script src="{{ page.extra_js | relative_url }}"></script>{% endif %}
+</body>
+</html>

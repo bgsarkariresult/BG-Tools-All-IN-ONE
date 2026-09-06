@@ -1,0 +1,32 @@
+---
+layout: default
+title: YouTube Tag Generator
+category: YouTube Tools
+description: "Free YouTube Tag Generator - video title/topic se tags generate karein aur copy karein."
+keywords: youtube tag generator free, video tags generator
+---
+<div class="tool-card">
+  <h1>🏷️ YouTube Tag Generator</h1>
+  <input type="text" id="topic" placeholder="e.g. Cooking Recipe">
+  <button class="btn" onclick="generateTags()">Tags Generate Karein</button>
+  <div class="result-box" id="result"></div>
+  <button class="btn secondary" id="copyBtn" style="display:none;margin-top:10px;" onclick="bgCopyText(window.lastTags)">Sabhi Tags Copy Karein</button>
+</div>
+<script>
+const mods = ['tutorial','2026','tips','tricks','guide','for beginners','in hindi','india','best','top','how to','review','vlog','shorts','explained'];
+function generateTags(){
+  const topic = document.getElementById('topic').value.trim();
+  const result = document.getElementById('result');
+  const copyBtn = document.getElementById('copyBtn');
+  if(!topic){ result.textContent = 'Pehle topic likhein.'; return; }
+  const words = topic.split(/\s+/);
+  let tags = new Set();
+  tags.add(topic);
+  words.forEach(w => tags.add(w));
+  mods.forEach(m => tags.add(`${topic} ${m}`));
+  const tagArr = [...tags];
+  window.lastTags = tagArr.join(', ');
+  result.innerHTML = tagArr.map(t => `<span class="tag-pill">${t}</span>`).join(' ');
+  copyBtn.style.display = 'inline-block';
+}
+</script>

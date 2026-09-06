@@ -1,0 +1,41 @@
+---
+layout: default
+title: Cover Letter Generator
+category: Resume Tools
+description: "Free Cover Letter Generator - job ke liye professional cover letter turant banayein."
+keywords: cover letter generator free online
+---
+<div class="tool-card">
+  <h1>✉️ Cover Letter Generator</h1>
+  <label>Your Name</label>
+  <input type="text" id="name" placeholder="e.g. Rahul Sharma">
+  <label>Job Title</label>
+  <input type="text" id="job" placeholder="e.g. Graphic Designer">
+  <label>Company Name</label>
+  <input type="text" id="company" placeholder="e.g. ABC Pvt Ltd">
+  <label>Your Key Skill/Strength</label>
+  <input type="text" id="skill" placeholder="e.g. 3 years of design experience">
+  <button class="btn" onclick="generate()">Cover Letter Generate Karein</button>
+  <textarea id="result" rows="14" readonly></textarea>
+  <button class="btn secondary" onclick="bgCopyText(document.getElementById('result').value)">Copy</button>
+</div>
+<script>
+function generate(){
+  const name = document.getElementById('name').value.trim() || '[Your Name]';
+  const job = document.getElementById('job').value.trim() || '[Job Title]';
+  const company = document.getElementById('company').value.trim() || '[Company Name]';
+  const skill = document.getElementById('skill').value.trim() || '[Your Key Skill]';
+  const letter =
+`Dear Hiring Manager,
+
+Main ${job} ki position ke liye apply karna chahta/chahti hoon jo aapne ${company} mein post ki hai. Mujhe vishwas hai ki meri skills aur experience is role ke liye bilkul sahi hain.
+
+${skill} ke saath, main is team mein value add karne ke liye taiyar hoon. Main naye challenges accept karne aur team ke sath mil kar kaam karne mein believe karta/karti hoon.
+
+Mujhe umeed hai ki aap mujhe is opportunity ke liye interview ka mauka denge. Dhanyavaad.
+
+Sincerely,
+${name}`;
+  document.getElementById('result').value = letter;
+}
+</script>

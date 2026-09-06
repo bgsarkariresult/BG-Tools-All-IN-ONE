@@ -1,0 +1,23 @@
+---
+layout: default
+title: Remove Duplicate Lines
+category: Text Tools
+description: "Text mein se duplicate lines free mein remove karein online."
+keywords: remove duplicate lines, unique lines tool
+---
+<div class="tool-card">
+  <h1>🧹 Remove Duplicate Lines</h1>
+  <textarea id="inputText" rows="10" placeholder="Har line alag row mein likhein..."></textarea>
+  <div>
+    <button class="btn" onclick="removeDup()">Duplicate Lines Hatayein</button>
+    <button class="btn secondary" onclick="bgCopyText(document.getElementById('inputText').value)">Copy</button>
+  </div>
+</div>
+<script>
+function removeDup(){
+  const el = document.getElementById('inputText');
+  const lines = el.value.split('\n');
+  const unique = [...new Set(lines.map(l => l.trim()))].filter(l => l !== '');
+  el.value = unique.join('\n');
+}
+</script>

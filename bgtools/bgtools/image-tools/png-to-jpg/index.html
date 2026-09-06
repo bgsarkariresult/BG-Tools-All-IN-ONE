@@ -1,0 +1,41 @@
+---
+layout: default
+title: PNG to JPG Converter
+category: Image Tools
+description: "Free PNG to JPG Converter - PNG image ko JPG mein convert karein online."
+keywords: png to jpg converter free
+---
+<div class="tool-card">
+  <h1>🔄 PNG → JPG Converter</h1>
+  <input type="file" id="fileInput" accept="image/png">
+  <button class="btn" onclick="convertImg('image/jpeg','converted.jpg')">Convert to JPG</button>
+  <div class="result-box" id="result" style="display:none;">
+    <img id="preview" style="max-width:100%;border-radius:8px;">
+    <br><button class="btn secondary" id="downloadBtn" style="margin-top:10px;">Download</button>
+  </div>
+</div>
+<script>
+function convertImg(mime, filename){
+  const file = document.getElementById('fileInput').files[0];
+  if(!file){ alert('Pehle image select karein.'); return; }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width; canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff'; ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.drawImage(img, 0, 0);
+      canvas.toBlob(function(blob){
+        const url = URL.createObjectURL(blob);
+        document.getElementById('preview').src = url;
+        document.getElementById('result').style.display = 'block';
+        document.getElementById('downloadBtn').onclick = () => bgDownloadBlob(blob, filename);
+      }, mime, 0.92);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+</script>

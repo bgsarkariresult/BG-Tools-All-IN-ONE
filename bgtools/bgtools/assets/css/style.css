@@ -1,0 +1,120 @@
+:root{
+  --primary:#4f46e5;
+  --primary-dark:#3730a3;
+  --bg:#f7f8fb;
+  --card:#ffffff;
+  --text:#1f2330;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+  --sidebar-w:270px;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:'Segoe UI',Roboto,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+a{color:inherit;text-decoration:none;}
+
+.topbar{
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;gap:12px;
+  background:var(--card);
+  border-bottom:1px solid var(--border);
+  padding:10px 16px;
+}
+.hamburger{
+  display:none;background:none;border:none;font-size:22px;cursor:pointer;
+}
+.topbar-brand{font-weight:700;font-size:20px;color:var(--primary-dark);}
+.topbar-tag{margin-left:auto;font-size:13px;color:var(--muted);background:#eef2ff;padding:4px 10px;border-radius:20px;}
+
+.layout{display:flex;min-height:calc(100vh - 54px);}
+
+.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:var(--card);
+  border-right:1px solid var(--border);
+  padding:14px;
+  overflow-y:auto;
+}
+.sidebar-brand{display:none;justify-content:space-between;align-items:center;margin-bottom:12px;font-weight:700;}
+.sidebar-close{background:none;border:none;font-size:20px;cursor:pointer;}
+
+.nav-link{
+  display:block;padding:9px 10px;border-radius:8px;font-weight:600;margin-bottom:6px;
+}
+.nav-link:hover,.nav-link.active{background:#eef2ff;color:var(--primary-dark);}
+
+.nav-group{margin-bottom:4px;}
+.nav-group-title{
+  width:100%;text-align:left;background:none;border:none;
+  padding:9px 10px;font-weight:700;font-size:14px;cursor:pointer;
+  border-radius:8px;color:var(--text);
+}
+.nav-group-title:hover{background:#f3f4f6;}
+.nav-group-items{display:none;flex-direction:column;padding-left:14px;}
+.nav-group.open .nav-group-items{display:flex;}
+.nav-group-items a{
+  padding:7px 10px;font-size:14px;border-radius:6px;color:var(--muted);
+}
+.nav-group-items a:hover{background:#eef2ff;color:var(--primary-dark);}
+
+.sidebar-overlay{display:none;}
+
+.content{flex:1;padding:24px 32px;max-width:900px;}
+.breadcrumb{font-size:13px;color:var(--muted);margin-bottom:14px;}
+
+.tool-card{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:24px;margin-bottom:20px;
+}
+.tool-card h1{margin-top:0;font-size:26px;}
+.tool-card p.desc{color:var(--muted);}
+
+textarea, input[type=text], input[type=number], input[type=date], select{
+  width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;
+  font-size:15px;margin-bottom:12px;font-family:inherit;
+}
+input[type=file]{margin-bottom:12px;}
+button.btn{
+  background:var(--primary);color:#fff;border:none;padding:11px 20px;
+  border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;
+}
+button.btn:hover{background:var(--primary-dark);}
+button.btn.secondary{background:#e5e7eb;color:var(--text);}
+
+.result-box{
+  margin-top:16px;padding:14px;background:#f3f4f6;border-radius:10px;
+  white-space:pre-wrap;word-break:break-word;font-size:14px;
+}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.tag-pill{
+  display:inline-block;background:#eef2ff;color:var(--primary-dark);
+  padding:5px 10px;border-radius:16px;margin:3px;font-size:13px;
+}
+.tools-index{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:10px;}
+.tools-index a{
+  background:var(--card);border:1px solid var(--border);border-radius:12px;
+  padding:16px;font-weight:600;text-align:center;
+}
+.tools-index a:hover{border-color:var(--primary);color:var(--primary-dark);}
+
+.site-footer{text-align:center;padding:18px;color:var(--muted);font-size:13px;border-top:1px solid var(--border);}
+
+@media (max-width:880px){
+  .hamburger{display:block;}
+  .sidebar{
+    position:fixed;left:-100%;top:0;bottom:0;z-index:100;
+    transition:left .25s ease;width:80%;max-width:300px;
+  }
+  .sidebar.open{left:0;}
+  .sidebar-brand{display:flex;}
+  .sidebar-overlay{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:90;
+  }
+  .sidebar-overlay.show{display:block;}
+  .content{padding:18px;}
+  .grid-2{grid-template-columns:1fr;}
+}
