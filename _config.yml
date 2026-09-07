@@ -1,7 +1,7 @@
 title: BG Tools
 description: "Free Online Tools - YouTube, Image, Video, PDF, Text, Calculator aur Resume Tools. 100% Free, No Signup."
-url: "https://YOUR-USERNAME.github.io"
-baseurl: "/bgtools"
+url: "url: "https://bgsarkariresult.github.io""
+baseurl: "/BG-Tools-All-IN-ONE"
 markdown: kramdown
 plugins:
   - jekyll-sitemap
