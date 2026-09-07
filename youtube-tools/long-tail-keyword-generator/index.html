@@ -1,0 +1,30 @@
+---
+layout: default
+title: Long-tail Keyword Generator
+category: YouTube Tools
+description: "Free Long-tail Keyword Generator - low competition, high value keywords banayein."
+keywords: long tail keyword generator free
+---
+<div class="tool-card">
+  <h1>🔗 Long-tail Keyword Generator</h1>
+  <input type="text" id="topic" placeholder="e.g. weight loss">
+  <button class="btn" onclick="generate()">Generate Karein</button>
+  <div class="result-box" id="result"></div>
+</div>
+<script>
+const questions = ['how to','what is','best way to','why does','when should you','where to find','how much does','can you'];
+const endings = ['for beginners','without gym','at home','in 7 days','naturally','fast','step by step','for free','2026'];
+function generate(){
+  const topic = document.getElementById('topic').value.trim();
+  const result = document.getElementById('result');
+  if(!topic){ result.textContent = 'Pehle topic likhein.'; return; }
+  let list = [];
+  questions.forEach(q => {
+    endings.forEach(e => {
+      if(Math.random() > 0.5) list.push(`${q} ${topic} ${e}`);
+    });
+  });
+  list = [...new Set(list)].slice(0,15);
+  result.innerHTML = list.map(k => `<div class="tag-pill" style="display:block;margin-bottom:6px;">${k}</div>`).join('');
+}
+</script>

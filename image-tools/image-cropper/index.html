@@ -1,0 +1,87 @@
+---
+layout: default
+title: Image Cropper
+category: Image Tools
+description: "Free Image Cropper - image ko drag karke crop karein online, bina signup."
+keywords: image cropper online free
+---
+<div class="tool-card">
+  <h1>✂️ Image Cropper</h1>
+  <input type="file" id="fileInput" accept="image/*" onchange="loadImg()">
+  <p class="desc">Image par mouse se drag karke crop area select karein.</p>
+  <div style="position:relative;display:inline-block;max-width:100%;">
+    <canvas id="canvas" style="max-width:100%;border:1px solid #e5e7eb;border-radius:8px;"></canvas>
+  </div>
+  <br>
+  <button class="btn" onclick="cropImage()" style="margin-top:12px;">Crop Karein</button>
+  <div class="result-box" id="result" style="display:none;">
+    <img id="preview" style="max-width:100%;border-radius:8px;">
+    <br><button class="btn secondary" id="downloadBtn" style="margin-top:10px;">Download</button>
+  </div>
+</div>
+<script>
+let img = null, canvas, ctx, startX, startY, curX, curY, dragging = false, scale = 1;
+function loadImg(){
+  const file = document.getElementById('fileInput').files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    img = new Image();
+    img.onload = function(){
+      canvas = document.getElementById('canvas');
+      ctx = canvas.getContext('2d');
+      const maxW = 700;
+      scale = img.width > maxW ? maxW / img.width : 1;
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      draw();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function draw(box){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+  if(box){
+    ctx.strokeStyle = '#4f46e5';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(box.x, box.y, box.w, box.h);
+  }
+}
+document.addEventListener('DOMContentLoaded', function(){
+  document.addEventListener('mousedown', function(e){
+    if(e.target.id === 'canvas'){
+      const rect = canvas.getBoundingClientRect();
+      startX = e.clientX - rect.left; startY = e.clientY - rect.top;
+      dragging = true;
+    }
+  });
+  document.addEventListener('mousemove', function(e){
+    if(dragging && canvas){
+      const rect = canvas.getBoundingClientRect();
+      curX = e.clientX - rect.left; curY = e.clientY - rect.top;
+      draw({x:Math.min(startX,curX), y:Math.min(startY,curY), w:Math.abs(curX-startX), h:Math.abs(curY-startY)});
+    }
+  });
+  document.addEventListener('mouseup', function(){ dragging = false; });
+});
+function cropImage(){
+  if(!img || startX === undefined || curX === undefined){ alert('Pehle image select karke crop area drag karein.'); return; }
+  const x = Math.min(startX, curX) / scale;
+  const y = Math.min(startY, curY) / scale;
+  const w = Math.abs(curX - startX) / scale;
+  const h = Math.abs(curY - startY) / scale;
+  if(w < 5 || h < 5){ alert('Crop area bahut chhota hai.'); return; }
+  const outCanvas = document.createElement('canvas');
+  outCanvas.width = w; outCanvas.height = h;
+  const outCtx = outCanvas.getContext('2d');
+  outCtx.drawImage(img, x, y, w, h, 0, 0, w, h);
+  outCanvas.toBlob(function(blob){
+    const url = URL.createObjectURL(blob);
+    document.getElementById('preview').src = url;
+    document.getElementById('result').style.display = 'block';
+    document.getElementById('downloadBtn').onclick = () => bgDownloadBlob(blob, 'cropped.png');
+  }, 'image/png');
+}
+</script>

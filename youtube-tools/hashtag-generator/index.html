@@ -1,0 +1,29 @@
+---
+layout: default
+title: YouTube Hashtag Generator
+category: YouTube Tools
+description: "Free YouTube Hashtag Generator - trending hashtags apne video topic ke liye banayein."
+keywords: youtube hashtag generator free
+---
+<div class="tool-card">
+  <h1>#️⃣ YouTube Hashtag Generator</h1>
+  <input type="text" id="topic" placeholder="e.g. Travel Vlog">
+  <button class="btn" onclick="generateHashtags()">Hashtags Generate Karein</button>
+  <div class="result-box" id="result"></div>
+</div>
+<script>
+const common = ['viral','trending','youtube','2026','shorts','india','explore','love','instagood','follow'];
+function generateHashtags(){
+  const topic = document.getElementById('topic').value.trim();
+  const result = document.getElementById('result');
+  if(!topic){ result.textContent = 'Pehle topic likhein.'; return; }
+  const words = topic.split(/\s+/).map(w => w.replace(/[^a-zA-Z0-9]/g,''));
+  let tags = new Set();
+  tags.add('#' + words.join(''));
+  words.forEach(w => { if(w) tags.add('#' + w.toLowerCase()); });
+  common.forEach(c => tags.add('#' + c));
+  const arr = [...tags];
+  result.innerHTML = arr.map(t => `<span class="tag-pill">${t}</span>`).join(' ') +
+    `<br><br><button class="btn secondary" onclick="bgCopyText('${arr.join(' ')}')">Sabhi Copy Karein</button>`;
+}
+</script>

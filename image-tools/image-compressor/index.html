@@ -1,0 +1,49 @@
+---
+layout: default
+title: Image Compressor
+category: Image Tools
+description: "Free Image Compressor - image size kam karein bina quality kharab kiye, sab browser mein."
+keywords: image compressor online free
+---
+<div class="tool-card">
+  <h1>🗜️ Image Compressor</h1>
+  <input type="file" id="fileInput" accept="image/*">
+  <label>Quality (<span id="qVal">70</span>%)</label>
+  <input type="range" id="quality" min="10" max="100" value="70" oninput="document.getElementById('qVal').textContent=this.value">
+  <button class="btn" onclick="compressImage()">Compress Karein</button>
+  <div class="result-box" id="result" style="display:none;">
+    <p id="sizeInfo"></p>
+    <img id="preview" style="max-width:100%;border-radius:8px;">
+    <br><button class="btn secondary" id="downloadBtn" style="margin-top:10px;">Download</button>
+  </div>
+</div>
+<script>
+let compressedUrl = null;
+function compressImage(){
+  const file = document.getElementById('fileInput').files[0];
+  if(!file){ alert('Pehle image select karein.'); return; }
+  const quality = document.getElementById('quality').value / 100;
+  const originalSize = (file.size / 1024).toFixed(1);
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function(){
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      canvas.toBlob(function(blob){
+        compressedUrl = URL.createObjectURL(blob);
+        const newSize = (blob.size / 1024).toFixed(1);
+        document.getElementById('preview').src = compressedUrl;
+        document.getElementById('sizeInfo').textContent = `Original: ${originalSize} KB → Compressed: ${newSize} KB`;
+        document.getElementById('result').style.display = 'block';
+        document.getElementById('downloadBtn').onclick = () => bgDownloadBlob(blob, 'compressed.jpg');
+      }, 'image/jpeg', quality);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+</script>

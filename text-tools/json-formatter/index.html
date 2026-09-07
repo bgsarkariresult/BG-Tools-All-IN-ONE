@@ -1,0 +1,41 @@
+---
+layout: default
+title: JSON Formatter
+category: Text Tools
+description: "JSON ko free mein format, beautify aur validate karein online."
+keywords: json formatter, json beautifier, json validator online free
+---
+<div class="tool-card">
+  <h1>{ } JSON Formatter</h1>
+  <textarea id="inputText" rows="10" placeholder='{"key":"value"}'></textarea>
+  <div>
+    <button class="btn" onclick="formatJson()">Format / Beautify</button>
+    <button class="btn secondary" onclick="minifyJson()">Minify</button>
+    <button class="btn secondary" onclick="bgCopyText(document.getElementById('inputText').value)">Copy</button>
+  </div>
+  <div class="result-box" id="err"></div>
+</div>
+<script>
+function formatJson(){
+  const el = document.getElementById('inputText');
+  const err = document.getElementById('err');
+  try{
+    const obj = JSON.parse(el.value);
+    el.value = JSON.stringify(obj, null, 2);
+    err.textContent = '✅ Valid JSON';
+  }catch(e){
+    err.textContent = '❌ Invalid JSON: ' + e.message;
+  }
+}
+function minifyJson(){
+  const el = document.getElementById('inputText');
+  const err = document.getElementById('err');
+  try{
+    const obj = JSON.parse(el.value);
+    el.value = JSON.stringify(obj);
+    err.textContent = '✅ Valid JSON';
+  }catch(e){
+    err.textContent = '❌ Invalid JSON: ' + e.message;
+  }
+}
+</script>

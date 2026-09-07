@@ -1,0 +1,30 @@
+---
+layout: default
+title: Keyword Extractor
+category: YouTube Tools
+description: "Free Keyword Extractor - kisi bhi text se important keywords nikaalein."
+keywords: keyword extractor online free
+---
+<div class="tool-card">
+  <h1>🔍 Keyword Extractor</h1>
+  <textarea id="inputText" rows="8" placeholder="Apna text/paragraph yahan paste karein..."></textarea>
+  <button class="btn" onclick="extractKeywords()">Keywords Nikaalein</button>
+  <div class="result-box" id="result"></div>
+</div>
+<script>
+const stopWords = new Set(['the','is','a','an','and','or','of','to','in','on','for','with','this','that','it','are','was','were','be','as','at','by','from','hai','ka','ki','ke','ko','me','mein','aur','ek','se','ye']);
+function extractKeywords(){
+  const text = document.getElementById('inputText').value.toLowerCase();
+  const result = document.getElementById('result');
+  if(!text.trim()){ result.textContent = 'Pehle text likhein.'; return; }
+  const words = text.match(/[a-zA-Z\u0900-\u097F]+/g) || [];
+  const freq = {};
+  words.forEach(w => {
+    if(!stopWords.has(w) && w.length > 2){
+      freq[w] = (freq[w] || 0) + 1;
+    }
+  });
+  const sorted = Object.entries(freq).sort((a,b) => b[1]-a[1]).slice(0,20);
+  result.innerHTML = sorted.map(([w,c]) => `<span class="tag-pill">${w} (${c})</span>`).join(' ') || 'Koi keyword nahi mila.';
+}
+</script>

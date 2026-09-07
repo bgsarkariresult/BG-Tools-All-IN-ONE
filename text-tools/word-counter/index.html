@@ -1,0 +1,31 @@
+---
+layout: default
+title: Word Counter
+category: Text Tools
+description: "Free online Word Counter - words, characters, sentences aur paragraphs turant count karein."
+keywords: word counter, words count, text counter online free
+---
+<div class="tool-card">
+  <h1>📝 Word Counter</h1>
+  <p class="desc">Apna text neeche paste karein - words, characters, sentences aur paragraphs turant count honge.</p>
+
+  <textarea id="inputText" rows="10" placeholder="Yahan apna text likhein ya paste karein..."></textarea>
+
+  <div class="result-box" id="stats">
+    Words: 0 | Characters: 0 | Sentences: 0 | Paragraphs: 0
+  </div>
+</div>
+
+<script>
+const input = document.getElementById('inputText');
+const stats = document.getElementById('stats');
+function updateStats(){
+  const text = input.value;
+  const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+  const chars = text.length;
+  const sentences = text.trim() === '' ? 0 : (text.match(/[.!?]+/g) || []).length;
+  const paragraphs = text.trim() === '' ? 0 : text.split(/\n+/).filter(p => p.trim() !== '').length;
+  stats.textContent = `Words: ${words} | Characters: ${chars} | Sentences: ${sentences} | Paragraphs: ${paragraphs}`;
+}
+input.addEventListener('input', updateStats);
+</script>

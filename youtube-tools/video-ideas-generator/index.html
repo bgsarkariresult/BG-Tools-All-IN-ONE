@@ -1,0 +1,34 @@
+---
+layout: default
+title: Video Ideas Generator
+category: YouTube Tools
+description: "Free Video Ideas Generator - apne niche ke liye naye video ideas turant payein."
+keywords: youtube video ideas generator free
+---
+<div class="tool-card">
+  <h1>💡 Video Ideas Generator</h1>
+  <input type="text" id="niche" placeholder="e.g. cooking, tech, fitness">
+  <button class="btn" onclick="generateIdeas()">Ideas Generate Karein</button>
+  <div class="result-box" id="result"></div>
+</div>
+<script>
+const formats = [
+  '5 mistakes beginners make in {niche}',
+  'Day in the life of a {niche} creator',
+  '{niche} myths busted',
+  'How I got started with {niche}',
+  'Top 10 {niche} products in 2026',
+  '{niche} vs {niche}: which is better?',
+  'Reacting to viral {niche} videos',
+  'Beginner guide to {niche}',
+  'Q&A: your {niche} questions answered',
+  '{niche} challenge - 24 hours'
+];
+function generateIdeas(){
+  const niche = document.getElementById('niche').value.trim();
+  const result = document.getElementById('result');
+  if(!niche){ result.textContent = 'Pehle niche/topic likhein.'; return; }
+  const ideas = formats.map(f => f.replace(/{niche}/g, niche));
+  result.innerHTML = ideas.map(i => `<div class="tag-pill" style="display:block;margin-bottom:6px;">${i}</div>`).join('');
+}
+</script>

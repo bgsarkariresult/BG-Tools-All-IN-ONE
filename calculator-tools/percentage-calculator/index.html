@@ -1,0 +1,32 @@
+---
+layout: default
+title: Percentage Calculator
+category: Calculator Tools
+description: "Free Percentage Calculator online - X ka Y% kitna hota hai turant jaanein."
+keywords: percentage calculator online free
+---
+<div class="tool-card">
+  <h1>％ Percentage Calculator</h1>
+  <div class="grid-2">
+    <div>
+      <label>Value</label>
+      <input type="number" id="val" placeholder="e.g. 500">
+    </div>
+    <div>
+      <label>Percentage (%)</label>
+      <input type="number" id="pct" placeholder="e.g. 20">
+    </div>
+  </div>
+  <button class="btn" onclick="calcPct()">Calculate</button>
+  <div class="result-box" id="result"></div>
+</div>
+<script>
+function calcPct(){
+  const val = parseFloat(document.getElementById('val').value);
+  const pct = parseFloat(document.getElementById('pct').value);
+  const result = document.getElementById('result');
+  if(isNaN(val) || isNaN(pct)){ result.textContent = 'Dono values bharein.'; return; }
+  const ans = (val * pct) / 100;
+  result.textContent = `${val} ka ${pct}% = ${ans}`;
+}
+</script>

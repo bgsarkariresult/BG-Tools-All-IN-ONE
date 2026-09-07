@@ -1,0 +1,26 @@
+---
+layout: default
+title: Text Formatter
+category: Text Tools
+description: "Extra spaces, empty lines hatayein aur text ko free mein clean/format karein."
+keywords: text formatter, clean text online free
+---
+<div class="tool-card">
+  <h1>🧾 Text Formatter</h1>
+  <textarea id="inputText" rows="10" placeholder="Yahan text likhein..."></textarea>
+  <div>
+    <button class="btn" onclick="trimSpaces()">Extra Spaces Hatayein</button>
+    <button class="btn" onclick="removeEmptyLines()">Empty Lines Hatayein</button>
+    <button class="btn secondary" onclick="bgCopyText(document.getElementById('inputText').value)">Copy</button>
+  </div>
+</div>
+<script>
+function trimSpaces(){
+  const el = document.getElementById('inputText');
+  el.value = el.value.replace(/[ \t]+/g,' ').split('\n').map(l => l.trim()).join('\n');
+}
+function removeEmptyLines(){
+  const el = document.getElementById('inputText');
+  el.value = el.value.split('\n').filter(l => l.trim() !== '').join('\n');
+}
+</script>
