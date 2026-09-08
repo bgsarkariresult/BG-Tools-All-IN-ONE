@@ -1,0 +1,57 @@
+{
+  "name": "BG Tools - Ek Jagah, Har Kaam Ka Tool",
+  "short_name": "BG Tools",
+  "description": "100% Free YouTube, Image, Video, PDF, Text, Calculator aur Resume tools - koi signup nahi, koi payment nahi.",
+  "start_url": "/BG-Tools-All-IN-ONE/",
+  "scope": "/BG-Tools-All-IN-ONE/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f0f7f4",
+  "theme_color": "#3B5BFE",
+  "lang": "hi",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/BG-Tools-All-IN-ONE/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/BG-Tools-All-IN-ONE/icons/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/BG-Tools-All-IN-ONE/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/BG-Tools-All-IN-ONE/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["utilities", "productivity", "tools"],
+  "shortcuts": [
+    {
+      "name": "YouTube Tools",
+      "url": "/BG-Tools-All-IN-ONE/youtube-tools/keyword-generator/",
+      "description": "YouTube keyword, tag, title tools"
+    },
+    {
+      "name": "Image Tools",
+      "url": "/BG-Tools-All-IN-ONE/image-tools/image-compressor/",
+      "description": "Image compress, resize, convert"
+    },
+    {
+      "name": "PDF Tools",
+      "url": "/BG-Tools-All-IN-ONE/pdf-tools/pdf-merge/",
+      "description": "PDF merge, split, compress"
+    }
+  ]
+}
