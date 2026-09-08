@@ -18,6 +18,8 @@
 
 <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
 {% seo %}
+<link rel="manifest" href="{{ '/manifest.json' | relative_url }}">
+<meta name="theme-color" content="#3B5BFE">
 </head>
 <body>
 
@@ -46,5 +48,12 @@
 
 <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
 {% if page.extra_js %}<script src="{{ page.extra_js | relative_url }}"></script>{% endif %}
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("{{ '/service-worker.js' | relative_url }}");
+  });
+}
+</script>
 </body>
 </html>
