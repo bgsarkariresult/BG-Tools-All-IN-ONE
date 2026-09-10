@@ -1,165 +1,208 @@
 ---
 layout: default
-title: YouTube Thumbnail Generator (Gadget)
+title: YouTube Gadget Thumbnail Maker
 category: YouTube Tools
-description: "Free YouTube Thumbnail Generator - gadget image se 16:9 professional thumbnail banaye. Amazon style, price badge, duration ke saath."
-keywords: youtube thumbnail generator free, gadget thumbnail maker, 16:9 thumbnail
+description: "Free high-quality YouTube thumbnail generator for gadgets - 16:9, price tags, arrows, professional style."
+keywords: youtube thumbnail generator, gadget thumbnail, free thumbnail maker
 ---
 <div class="tool-card">
-  <h1>🎬 YouTube Thumbnail Generator (Gadget Style)</h1>
-  <p>Gadget image upload karo → title, price badge, duration add karo → 16:9 (1280×720) thumbnail download karo. Free + private.</p>
+  <h1>🎬 High Quality Gadget Thumbnail Maker</h1>
+  <p>Product image upload karo → professional YouTube style thumbnail (jaise aapke screenshots) banega. 1280×720 | 100% Free</p>
 
   <input type="file" id="fileInput" accept="image/*" onchange="loadImg()">
-  
-  <div class="grid-2" style="margin-top:15px;">
+
+  <div class="grid-2" style="margin-top:12px;">
     <div>
-      <label>Main Title (bada text)</label>
-      <input type="text" id="mainTitle" placeholder="e.g. Mini Projector Review" value="Available at amazon">
+      <label>Main Title</label>
+      <input type="text" id="mainTitle" value="BEST PHONE ACCESSORIES" placeholder="BEST PHONE ACCESSORIES">
     </div>
     <div>
-      <label>Price / Badge Text</label>
-      <input type="text" id="priceText" placeholder="e.g. Rs.249" value="Rs.249">
+      <label>Price Tag 1</label>
+      <input type="text" id="price1" value="₹99/-" placeholder="₹99/-">
     </div>
   </div>
 
   <div class="grid-2">
     <div>
-      <label>Duration (bottom-right)</label>
-      <input type="text" id="duration" placeholder="8:15" value="8:15">
+      <label>Price Tag 2 (optional)</label>
+      <input type="text" id="price2" value="₹4199" placeholder="₹4199">
     </div>
     <div>
-      <label>Text Color</label>
-      <select id="textColor">
-        <option value="#ffffff">White</option>
-        <option value="#ffdd00">Yellow</option>
-        <option value="#00ff88">Green</option>
-        <option value="#ff4444">Red</option>
-      </select>
+      <label>Duration</label>
+      <input type="text" id="duration" value="12:41" placeholder="12:41">
     </div>
   </div>
 
-  <label style="margin-top:10px;display:block;">
-    <input type="checkbox" id="darkOverlay" checked style="width:auto;"> Dark overlay (text clear dikhe)
-  </label>
-  <label style="display:block;">
-    <input type="checkbox" id="blurBg" style="width:auto;"> Background thoda blur
-  </label>
+  <div style="margin-top:10px;">
+    <label>Style Template</label>
+    <select id="template">
+      <option value="closeup">Close-up Product + Arrow + Price</option>
+      <option value="banner">Bold Banner Title + Prices</option>
+      <option value="amazon">Amazon Style (Available at amazon)</option>
+      <option value="glow">Glowing Product Focus</option>
+    </select>
+  </div>
 
-  <button class="btn" onclick="generateThumbnail()" style="margin-top:15px;">Thumbnail Banao</button>
+  <label style="display:block;margin-top:8px;"><input type="checkbox" id="showArrow" checked style="width:auto;"> Red Arrow dikhao</label>
+  <label style="display:block;"><input type="checkbox" id="darkOverlay" checked style="width:auto;"> Dark Overlay (text clear)</label>
 
-  <div class="result-box" id="result" style="display:none;margin-top:20px;">
-    <canvas id="canvas" style="max-width:100%;border-radius:8px;border:1px solid #333;"></canvas>
+  <button class="btn" onclick="generate()" style="margin-top:14px;">🔥 High Quality Thumbnail Banao</button>
+
+  <div class="result-box" id="result" style="display:none;margin-top:18px;">
+    <canvas id="c" style="max-width:100%;border-radius:10px;border:1px solid #444;"></canvas>
     <br>
-    <button class="btn secondary" id="downloadBtn" style="margin-top:10px;">Download 1280×720 PNG</button>
+    <button class="btn secondary" id="dl" style="margin-top:10px;">Download 1280×720 PNG</button>
   </div>
 </div>
 
 <script>
-let origImg = null;
+let img = null;
 
 function loadImg(){
-  const file = document.getElementById('fileInput').files[0];
-  if(!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    origImg = new Image();
-    origImg.onload = () => console.log('Image loaded');
-    origImg.src = e.target.result;
+  const f = document.getElementById('fileInput').files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    img = new Image();
+    img.onload = () => console.log('ready');
+    img.src = e.target.result;
   };
-  reader.readAsDataURL(file);
+  r.readAsDataURL(f);
 }
 
-function generateThumbnail(){
-  if(!origImg){ alert('Pehle gadget image select karo!'); return; }
+function roundRect(ctx,x,y,w,h,r){
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
 
-  const W = 1280, H = 720;
-  const canvas = document.getElementById('canvas');
-  canvas.width = W; canvas.height = H;
+function generate(){
+  if(!img){ alert('Pehle product image select karo!'); return; }
+
+  const W=1280, H=720;
+  const canvas = document.getElementById('c');
+  canvas.width=W; canvas.height=H;
   const ctx = canvas.getContext('2d');
 
-  // Background fill
-  ctx.fillStyle = '#111';
-  ctx.fillRect(0, 0, W, H);
+  // Background
+  ctx.fillStyle = '#0a0a0a';
+  ctx.fillRect(0,0,W,H);
 
-  // Draw image (cover style)
-  const scale = Math.max(W / origImg.width, H / origImg.height);
-  const x = (W - origImg.width * scale) / 2;
-  const y = (H - origImg.height * scale) / 2;
-  ctx.drawImage(origImg, x, y, origImg.width * scale, origImg.height * scale);
+  // Product image - smart cover
+  const scale = Math.max(W/img.width, H/img.height) * 0.92;
+  const iw = img.width*scale, ih = img.height*scale;
+  const ix = (W-iw)/2, iy = (H-ih)/2;
+  ctx.drawImage(img, ix, iy, iw, ih);
 
-  // Optional blur (simple approximation by drawing smaller)
-  if(document.getElementById('blurBg').checked){
-    // simple soft overlay
-    ctx.fillStyle = 'rgba(0,0,0,0.15)';
+  // Soft vignette
+  const g = ctx.createRadialGradient(W/2,H/2,200, W/2,H/2,700);
+  g.addColorStop(0,'rgba(0,0,0,0)');
+  g.addColorStop(1,'rgba(0,0,0,0.55)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,W,H);
+
+  if(document.getElementById('darkOverlay').checked){
+    const grad = ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,'rgba(0,0,0,0.35)');
+    grad.addColorStop(0.45,'rgba(0,0,0,0)');
+    grad.addColorStop(1,'rgba(0,0,0,0.7)');
+    ctx.fillStyle = grad;
     ctx.fillRect(0,0,W,H);
   }
 
-  // Dark gradient overlay for text readability
-  if(document.getElementById('darkOverlay').checked){
-    const grad = ctx.createLinearGradient(0, H*0.4, 0, H);
-    grad.addColorStop(0, 'rgba(0,0,0,0)');
-    grad.addColorStop(1, 'rgba(0,0,0,0.75)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
-  }
+  const title = document.getElementById('mainTitle').value;
+  const p1 = document.getElementById('price1').value;
+  const p2 = document.getElementById('price2').value;
+  const dur = document.getElementById('duration').value;
+  const tpl = document.getElementById('template').value;
 
-  const mainTitle = document.getElementById('mainTitle').value || '';
-  const priceText = document.getElementById('priceText').value || '';
-  const duration = document.getElementById('duration').value || '';
-  const color = document.getElementById('textColor').value;
+  // ===== TITLE =====
+  ctx.textAlign = 'left';
+  ctx.lineJoin = 'round';
 
-  // Main title (top-left style like example)
-  ctx.font = 'bold 52px Arial, sans-serif';
-  ctx.fillStyle = color;
-  ctx.strokeStyle = '#000';
-  ctx.lineWidth = 6;
-  ctx.strokeText(mainTitle, 40, 90);
-  ctx.fillText(mainTitle, 40, 90);
-
-  // Price badge (yellow box like Amazon style)
-  if(priceText){
-    ctx.font = 'bold 48px Arial';
-    const tw = ctx.measureText(priceText).width + 40;
-    ctx.fillStyle = '#ffcc00';
-    roundRect(ctx, 40, 110, tw, 70, 12);
+  if(tpl === 'banner' || tpl === 'amazon'){
+    // White banner style
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    roundRect(ctx, 30, 25, Math.min(ctx.measureText(title).width + 80, 900), 70, 12);
     ctx.fill();
-    ctx.fillStyle = '#000';
-    ctx.fillText(priceText, 60, 160);
+    ctx.font = 'bold 42px Arial, sans-serif';
+    ctx.fillStyle = '#111';
+    ctx.fillText(title, 50, 72);
+  } else {
+    // Bold outlined title
+    ctx.font = 'bold 58px Impact, Arial Black, sans-serif';
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 10;
+    ctx.strokeText(title, 40, 85);
+    ctx.fillStyle = '#fff';
+    ctx.fillText(title, 40, 85);
   }
 
-  // Duration badge (bottom-right)
-  if(duration){
+  // ===== PRICE TAGS =====
+  function drawPrice(text, x, y, bg){
+    if(!text) return;
     ctx.font = 'bold 36px Arial';
-    const dw = ctx.measureText(duration).width + 30;
-    ctx.fillStyle = 'rgba(0,0,0,0.85)';
-    roundRect(ctx, W - dw - 30, H - 70, dw, 50, 8);
+    const tw = ctx.measureText(text).width + 28;
+    ctx.fillStyle = bg || '#e53935';
+    roundRect(ctx, x, y, tw, 52, 8);
     ctx.fill();
     ctx.fillStyle = '#fff';
-    ctx.fillText(duration, W - dw - 15, H - 35);
+    ctx.fillText(text, x+14, y+36);
+  }
+
+  if(tpl === 'amazon'){
+    // Amazon style yellow
+    ctx.font = 'bold 44px Arial';
+    const tw = ctx.measureText(p1).width + 36;
+    ctx.fillStyle = '#ffcc00';
+    roundRect(ctx, 40, 120, tw, 62, 10);
+    ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.fillText(p1, 58, 163);
+  } else {
+    drawPrice(p1, 40, 130, '#e53935');
+    if(p2) drawPrice(p2, 40, 200, '#1565c0');
+  }
+
+  // ===== RED ARROW =====
+  if(document.getElementById('showArrow').checked){
+    ctx.fillStyle = '#ff1744';
+    ctx.beginPath();
+    ctx.moveTo(280, 280);
+    ctx.lineTo(380, 320);
+    ctx.lineTo(280, 360);
+    ctx.closePath();
+    ctx.fill();
+    // arrow body
+    ctx.fillRect(180, 305, 110, 30);
+  }
+
+  // ===== DURATION =====
+  if(dur){
+    ctx.font = 'bold 32px Arial';
+    const dw = ctx.measureText(dur).width + 28;
+    ctx.fillStyle = 'rgba(0,0,0,0.85)';
+    roundRect(ctx, W-dw-25, H-60, dw, 42, 6);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.fillText(dur, W-dw-11, H-30);
   }
 
   document.getElementById('result').style.display = 'block';
-  document.getElementById('downloadBtn').onclick = () => {
-    canvas.toBlob(blob => {
-      if(typeof bgDownloadBlob === 'function'){
-        bgDownloadBlob(blob, 'youtube-thumbnail-1280x720.png');
-      } else {
+  document.getElementById('dl').onclick = () => {
+    canvas.toBlob(b => {
+      if(typeof bgDownloadBlob === 'function') bgDownloadBlob(b, 'gadget-thumbnail-1280x720.png');
+      else {
         const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'youtube-thumbnail-1280x720.png';
+        a.href = URL.createObjectURL(b);
+        a.download = 'gadget-thumbnail-1280x720.png';
         a.click();
       }
-    }, 'image/png');
+    }, 'image/png', 1);
   };
-}
-
-function roundRect(ctx, x, y, w, h, r){
-  ctx.beginPath();
-  ctx.moveTo(x+r, y);
-  ctx.arcTo(x+w, y, x+w, y+h, r);
-  ctx.arcTo(x+w, y+h, x, y+h, r);
-  ctx.arcTo(x, y+h, x, y, r);
-  ctx.arcTo(x, y, x+w, y, r);
-  ctx.closePath();
 }
 </script>
