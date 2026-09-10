@@ -1,208 +1,841 @@
 ---
 layout: default
-title: YouTube Gadget Thumbnail Maker
+title: Gadget Thumbnail Maker
 category: YouTube Tools
-description: "Free high-quality YouTube thumbnail generator for gadgets - 16:9, price tags, arrows, professional style."
-keywords: youtube thumbnail generator, gadget thumbnail, free thumbnail maker
+description: "Free professional YouTube Gadget Thumbnail Maker — 1280×720, 5 styles, arrows, price badges, 100% browser-side, no AI, no upload."
+keywords: youtube thumbnail maker, gadget thumbnail generator, free tech thumbnail, 1280x720 thumbnail
 ---
-<div class="tool-card">
-  <h1>🎬 High Quality Gadget Thumbnail Maker</h1>
-  <p>Product image upload karo → professional YouTube style thumbnail (jaise aapke screenshots) banega. 1280×720 | 100% Free</p>
+<style>
+  .gtm-wrap { max-width: 1100px; }
+  .gtm-grid { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; }
+  @media (max-width: 900px) { .gtm-grid { grid-template-columns: 1fr; } }
+  .gtm-panel { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+  .gtm-panel h3 { margin: 0 0 10px; font-size: 15px; font-weight: 700; color: var(--brand); }
+  .gtm-label { display: block; font-size: 13px; font-weight: 600; margin: 8px 0 4px; color: var(--ink); }
+  .gtm-drop {
+    border: 2px dashed #c5c9d4; border-radius: 14px; padding: 28px 16px; text-align: center;
+    background: #F8F8F5; cursor: pointer; transition: border-color .2s, background .2s;
+  }
+  .gtm-drop.dragover { border-color: var(--brand); background: #EEF0FF; }
+  .gtm-drop img { max-width: 100%; max-height: 140px; border-radius: 8px; margin-top: 10px; }
+  .gtm-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .gtm-row label { font-size: 13px; font-weight: 600; }
+  .gtm-slider { width: 100%; margin: 4px 0 8px; }
+  .gtm-preview-box {
+    background: #111; border-radius: 12px; overflow: hidden; position: relative;
+    aspect-ratio: 16/9; border: 1px solid #333;
+  }
+  .gtm-preview-box canvas { width: 100%; height: auto; display: block; }
+  .gtm-variations { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 14px; }
+  @media (max-width: 700px) { .gtm-variations { grid-template-columns: 1fr; } }
+  .gtm-var-card { background: #111; border-radius: 10px; overflow: hidden; border: 1px solid #333; }
+  .gtm-var-card canvas { width: 100%; height: auto; display: block; }
+  .gtm-var-actions { padding: 8px; display: flex; gap: 6px; flex-wrap: wrap; background: #1a1a1a; }
+  .gtm-var-actions button { flex: 1; font-size: 12px; padding: 8px 6px; }
+  .gtm-privacy { font-size: 12px; color: var(--muted); margin-top: 10px; }
+  .gtm-style-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .gtm-style-btns button {
+    padding: 7px 12px; border-radius: 8px; border: 1.5px solid var(--border);
+    background: #fff; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit;
+  }
+  .gtm-style-btns button.active { background: var(--brand); color: #fff; border-color: var(--brand); }
+  .gtm-badge-opts { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+  .gtm-badge-opts button {
+    padding: 5px 10px; border-radius: 16px; border: 1px solid var(--border);
+    background: #F6F6F2; font-size: 12px; font-weight: 600; cursor: pointer;
+  }
+  .gtm-badge-opts button:hover { background: #EEF0FF; }
+  .gtm-msg { padding: 10px 14px; border-radius: 10px; background: #FEF3E2; color: #9A3412; font-size: 14px; margin: 10px 0; display: none; }
+  .gtm-msg.show { display: block; }
+  .gtm-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .gtm-actions .btn { flex: 1; min-width: 120px; }
+  input[type=range] { accent-color: var(--brand); }
+  .gtm-check { display: flex; align-items: center; gap: 6px; margin: 6px 0; font-size: 13px; font-weight: 600; }
+  .gtm-check input { width: auto; margin: 0; }
+</style>
 
-  <input type="file" id="fileInput" accept="image/*" onchange="loadImg()">
+<div class="tool-card gtm-wrap" style="--cat:#E11D48;">
+  <h1>🎬 Gadget Thumbnail Maker</h1>
+  <p class="desc">Create Professional Tech YouTube Thumbnails — 100% Free · 1280×720 · No AI · No Upload</p>
 
-  <div class="grid-2" style="margin-top:12px;">
+  <div class="gtm-msg" id="gtmMsg" role="alert"></div>
+
+  <div class="gtm-grid">
+    <!-- LEFT: CONTROLS -->
     <div>
-      <label>Main Title</label>
-      <input type="text" id="mainTitle" value="BEST PHONE ACCESSORIES" placeholder="BEST PHONE ACCESSORIES">
+      <div class="gtm-panel" style="margin-bottom:14px;">
+        <h3>1. Upload Gadget Image</h3>
+        <div class="gtm-drop" id="dropZone" tabindex="0" role="button" aria-label="Upload gadget image">
+          <div id="dropText">
+            <strong>Upload Gadget Image</strong><br>
+            <span style="font-size:13px;color:var(--muted);">PNG, JPG or WEBP</span><br>
+            <button type="button" class="btn secondary" style="margin-top:10px;padding:8px 16px;" id="chooseBtn">Choose Image</button>
+          </div>
+          <img id="origPreview" alt="Original preview" style="display:none;">
+        </div>
+        <input type="file" id="fileInput" accept="image/png,image/jpeg,image/jpg,image/webp" hidden>
+        <p class="gtm-privacy">Your image is processed locally in your browser. No image upload required.</p>
+      </div>
+
+      <div class="gtm-panel" style="margin-bottom:14px;">
+        <h3>2. Text & Badges</h3>
+        <label class="gtm-label" for="headline">Thumbnail Headline</label>
+        <input type="text" id="headline" placeholder="Example: BEST GADGET UNDER ₹999" value="BEST GADGET UNDER ₹999">
+
+        <label class="gtm-label" for="price">Price</label>
+        <input type="text" id="price" placeholder="Example: ₹999" value="₹999">
+
+        <label class="gtm-label" for="badge">Small Badge</label>
+        <input type="text" id="badge" placeholder="Example: NEW" value="NEW">
+        <div class="gtm-badge-opts" id="badgeQuick">
+          <button type="button" data-b="NEW">NEW</button>
+          <button type="button" data-b="HOT">HOT</button>
+          <button type="button" data-b="BEST">BEST</button>
+          <button type="button" data-b="TOP">TOP</button>
+          <button type="button" data-b="₹ DEAL">₹ DEAL</button>
+          <button type="button" data-b="MUST BUY">MUST BUY</button>
+        </div>
+
+        <label class="gtm-label" for="duration">Duration</label>
+        <input type="text" id="duration" placeholder="Example: 08:42" value="08:42">
+      </div>
+
+      <div class="gtm-panel" style="margin-bottom:14px;">
+        <h3>3. Style</h3>
+        <div class="gtm-style-btns" id="styleBtns">
+          <button type="button" data-s="1" class="active">TECH BLUE</button>
+          <button type="button" data-s="2">TECH RED</button>
+          <button type="button" data-s="3">YELLOW VIRAL</button>
+          <button type="button" data-s="4">DARK PREMIUM</button>
+          <button type="button" data-s="5">CLEAN TECH</button>
+        </div>
+        <label class="gtm-label">Background Intensity</label>
+        <input type="range" class="gtm-slider" id="bgIntensity" min="0" max="100" value="70">
+      </div>
+
+      <div class="gtm-panel" style="margin-bottom:14px;">
+        <h3>4. Product Controls</h3>
+        <label class="gtm-label">Product Size</label>
+        <input type="range" class="gtm-slider" id="prodSize" min="30" max="90" value="58">
+        <label class="gtm-label">Product X</label>
+        <input type="range" class="gtm-slider" id="prodX" min="0" max="100" value="72">
+        <label class="gtm-label">Product Y</label>
+        <input type="range" class="gtm-slider" id="prodY" min="0" max="100" value="50">
+        <label class="gtm-label">Rotation (°)</label>
+        <input type="range" class="gtm-slider" id="prodRot" min="-25" max="25" value="-4">
+      </div>
+
+      <div class="gtm-panel" style="margin-bottom:14px;">
+        <h3>5. Text Position & Size</h3>
+        <label class="gtm-label">Headline Size</label>
+        <input type="range" class="gtm-slider" id="headSize" min="36" max="96" value="64">
+        <label class="gtm-label">Headline X</label>
+        <input type="range" class="gtm-slider" id="headX" min="2" max="60" value="5">
+        <label class="gtm-label">Headline Y</label>
+        <input type="range" class="gtm-slider" id="headY" min="8" max="70" value="18">
+      </div>
+
+      <div class="gtm-panel" style="margin-bottom:14px;">
+        <h3>6. Accents</h3>
+        <label class="gtm-check"><input type="checkbox" id="showArrow" checked> Show Red Arrow</label>
+        <label class="gtm-label">Arrow X</label>
+        <input type="range" class="gtm-slider" id="arrowX" min="10" max="90" value="42">
+        <label class="gtm-label">Arrow Y</label>
+        <input type="range" class="gtm-slider" id="arrowY" min="20" max="80" value="55">
+
+        <label class="gtm-check"><input type="checkbox" id="showCircle" checked> Show Highlight Circle</label>
+        <label class="gtm-label">Circle X</label>
+        <input type="range" class="gtm-slider" id="circX" min="20" max="90" value="75">
+        <label class="gtm-label">Circle Y</label>
+        <input type="range" class="gtm-slider" id="circY" min="20" max="80" value="48">
+        <label class="gtm-label">Circle Size</label>
+        <input type="range" class="gtm-slider" id="circSize" min="80" max="420" value="260">
+      </div>
+
+      <div class="gtm-actions">
+        <button type="button" class="btn" id="btnGenerate">Generate Thumbnail</button>
+        <button type="button" class="btn secondary" id="btnVariations">Generate 3 Variations</button>
+      </div>
+      <div class="gtm-actions">
+        <button type="button" class="btn" id="btnDlPng">Download PNG</button>
+        <button type="button" class="btn secondary" id="btnDlJpg">Download JPG</button>
+      </div>
     </div>
+
+    <!-- RIGHT: PREVIEW -->
     <div>
-      <label>Price Tag 1</label>
-      <input type="text" id="price1" value="₹99/-" placeholder="₹99/-">
+      <div class="gtm-panel">
+        <h3>Live Preview · 1280 × 720</h3>
+        <div class="gtm-preview-box">
+          <canvas id="mainCanvas" width="1280" height="720" aria-label="Thumbnail preview"></canvas>
+        </div>
+      </div>
+      <div id="variationsBox" style="display:none;">
+        <h3 style="margin:16px 0 8px;font-size:16px;">3 Variations</h3>
+        <div class="gtm-variations" id="variations"></div>
+      </div>
     </div>
-  </div>
-
-  <div class="grid-2">
-    <div>
-      <label>Price Tag 2 (optional)</label>
-      <input type="text" id="price2" value="₹4199" placeholder="₹4199">
-    </div>
-    <div>
-      <label>Duration</label>
-      <input type="text" id="duration" value="12:41" placeholder="12:41">
-    </div>
-  </div>
-
-  <div style="margin-top:10px;">
-    <label>Style Template</label>
-    <select id="template">
-      <option value="closeup">Close-up Product + Arrow + Price</option>
-      <option value="banner">Bold Banner Title + Prices</option>
-      <option value="amazon">Amazon Style (Available at amazon)</option>
-      <option value="glow">Glowing Product Focus</option>
-    </select>
-  </div>
-
-  <label style="display:block;margin-top:8px;"><input type="checkbox" id="showArrow" checked style="width:auto;"> Red Arrow dikhao</label>
-  <label style="display:block;"><input type="checkbox" id="darkOverlay" checked style="width:auto;"> Dark Overlay (text clear)</label>
-
-  <button class="btn" onclick="generate()" style="margin-top:14px;">🔥 High Quality Thumbnail Banao</button>
-
-  <div class="result-box" id="result" style="display:none;margin-top:18px;">
-    <canvas id="c" style="max-width:100%;border-radius:10px;border:1px solid #444;"></canvas>
-    <br>
-    <button class="btn secondary" id="dl" style="margin-top:10px;">Download 1280×720 PNG</button>
   </div>
 </div>
 
 <script>
-let img = null;
+(function () {
+  const W = 1280, H = 720;
+  let productImg = null;
+  let currentStyle = 1;
+  let mainCanvas = document.getElementById('mainCanvas');
+  let ctx = mainCanvas.getContext('2d');
 
-function loadImg(){
-  const f = document.getElementById('fileInput').files[0];
-  if(!f) return;
-  const r = new FileReader();
-  r.onload = e => {
-    img = new Image();
-    img.onload = () => console.log('ready');
-    img.src = e.target.result;
+  const $ = id => document.getElementById(id);
+  const msgEl = $('gtmMsg');
+
+  function showMsg(t) {
+    msgEl.textContent = t;
+    msgEl.classList.add('show');
+    setTimeout(() => msgEl.classList.remove('show'), 4000);
+  }
+
+  // ---- Styles palette ----
+  const STYLES = {
+    1: { // TECH BLUE
+      name: 'TECH BLUE',
+      bg: ['#0a1628', '#0d3a6e', '#00c2ff'],
+      accent: '#00e5ff',
+      headFill: '#ffffff',
+      headStroke: '#003366',
+      headHighlight: '#ffe566',
+      priceBg: '#ff1744',
+      badgeBg: '#00e5ff',
+      glow: 'rgba(0,200,255,0.45)'
+    },
+    2: { // TECH RED
+      name: 'TECH RED',
+      bg: ['#2a0505', '#8b0000', '#ff4500'],
+      accent: '#ff1744',
+      headFill: '#ffffff',
+      headStroke: '#4a0000',
+      headHighlight: '#ffeb3b',
+      priceBg: '#ffeb3b',
+      badgeBg: '#ff1744',
+      glow: 'rgba(255,50,0,0.4)'
+    },
+    3: { // YELLOW VIRAL
+      name: 'YELLOW VIRAL',
+      bg: ['#ff8c00', '#ffc107', '#ffeb3b'],
+      accent: '#d50000',
+      headFill: '#111111',
+      headStroke: '#ffffff',
+      headHighlight: '#d50000',
+      priceBg: '#d50000',
+      badgeBg: '#111111',
+      glow: 'rgba(0,0,0,0.25)'
+    },
+    4: { // DARK PREMIUM
+      name: 'DARK PREMIUM',
+      bg: ['#050508', '#0d1b2a', '#1b2838'],
+      accent: '#00ffcc',
+      headFill: '#00ffcc',
+      headStroke: '#001a14',
+      headHighlight: '#ffffff',
+      priceBg: '#00ffcc',
+      badgeBg: '#7c4dff',
+      glow: 'rgba(0,255,200,0.35)'
+    },
+    5: { // CLEAN TECH
+      name: 'CLEAN TECH',
+      bg: ['#e8eef5', '#f5f7fa', '#ffffff'],
+      accent: '#1565c0',
+      headFill: '#0d47a1',
+      headStroke: '#ffffff',
+      headHighlight: '#e53935',
+      priceBg: '#e53935',
+      badgeBg: '#1565c0',
+      glow: 'rgba(21,101,192,0.2)'
+    }
   };
-  r.readAsDataURL(f);
-}
 
-function roundRect(ctx,x,y,w,h,r){
-  ctx.beginPath();
-  ctx.moveTo(x+r,y);
-  ctx.arcTo(x+w,y,x+w,y+h,r);
-  ctx.arcTo(x+w,y+h,x,y+h,r);
-  ctx.arcTo(x,y+h,x,y,r);
-  ctx.arcTo(x,y,x+w,y,r);
-  ctx.closePath();
-}
+  // ---- Upload ----
+  const dropZone = $('dropZone');
+  const fileInput = $('fileInput');
+  $('chooseBtn').addEventListener('click', e => { e.stopPropagation(); fileInput.click(); });
+  dropZone.addEventListener('click', () => fileInput.click());
+  dropZone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
 
-function generate(){
-  if(!img){ alert('Pehle product image select karo!'); return; }
+  ['dragenter', 'dragover'].forEach(ev => {
+    dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  });
+  ['dragleave', 'drop'].forEach(ev => {
+    dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+  });
+  dropZone.addEventListener('drop', e => {
+    const f = e.dataTransfer.files[0];
+    if (f) handleFile(f);
+  });
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files[0]) handleFile(fileInput.files[0]);
+  });
 
-  const W=1280, H=720;
-  const canvas = document.getElementById('c');
-  canvas.width=W; canvas.height=H;
-  const ctx = canvas.getContext('2d');
+  function handleFile(file) {
+    const ok = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'].includes(file.type) ||
+               /\.(png|jpe?g|webp)$/i.test(file.name);
+    if (!ok) { showMsg('Please upload PNG, JPG or WEBP.'); return; }
 
-  // Background
-  ctx.fillStyle = '#0a0a0a';
-  ctx.fillRect(0,0,W,H);
-
-  // Product image - smart cover
-  const scale = Math.max(W/img.width, H/img.height) * 0.92;
-  const iw = img.width*scale, ih = img.height*scale;
-  const ix = (W-iw)/2, iy = (H-ih)/2;
-  ctx.drawImage(img, ix, iy, iw, ih);
-
-  // Soft vignette
-  const g = ctx.createRadialGradient(W/2,H/2,200, W/2,H/2,700);
-  g.addColorStop(0,'rgba(0,0,0,0)');
-  g.addColorStop(1,'rgba(0,0,0,0.55)');
-  ctx.fillStyle = g;
-  ctx.fillRect(0,0,W,H);
-
-  if(document.getElementById('darkOverlay').checked){
-    const grad = ctx.createLinearGradient(0,0,0,H);
-    grad.addColorStop(0,'rgba(0,0,0,0.35)');
-    grad.addColorStop(0.45,'rgba(0,0,0,0)');
-    grad.addColorStop(1,'rgba(0,0,0,0.7)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0,0,W,H);
+    const reader = new FileReader();
+    reader.onerror = () => showMsg('Unable to load this image.');
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        // Downscale very large images for performance
+        const maxSide = 2000;
+        if (img.naturalWidth > maxSide || img.naturalHeight > maxSide) {
+          const scale = maxSide / Math.max(img.naturalWidth, img.naturalHeight);
+          const c = document.createElement('canvas');
+          c.width = Math.round(img.naturalWidth * scale);
+          c.height = Math.round(img.naturalHeight * scale);
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          const scaled = new Image();
+          scaled.onload = () => { productImg = scaled; showOrig(scaled); render(); };
+          scaled.src = c.toDataURL('image/png');
+        } else {
+          productImg = img;
+          showOrig(img);
+          render();
+        }
+      };
+      img.onerror = () => showMsg('Unable to load this image.');
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
   }
 
-  const title = document.getElementById('mainTitle').value;
-  const p1 = document.getElementById('price1').value;
-  const p2 = document.getElementById('price2').value;
-  const dur = document.getElementById('duration').value;
-  const tpl = document.getElementById('template').value;
-
-  // ===== TITLE =====
-  ctx.textAlign = 'left';
-  ctx.lineJoin = 'round';
-
-  if(tpl === 'banner' || tpl === 'amazon'){
-    // White banner style
-    ctx.fillStyle = 'rgba(255,255,255,0.95)';
-    roundRect(ctx, 30, 25, Math.min(ctx.measureText(title).width + 80, 900), 70, 12);
-    ctx.fill();
-    ctx.font = 'bold 42px Arial, sans-serif';
-    ctx.fillStyle = '#111';
-    ctx.fillText(title, 50, 72);
-  } else {
-    // Bold outlined title
-    ctx.font = 'bold 58px Impact, Arial Black, sans-serif';
-    ctx.strokeStyle = '#000';
-    ctx.lineWidth = 10;
-    ctx.strokeText(title, 40, 85);
-    ctx.fillStyle = '#fff';
-    ctx.fillText(title, 40, 85);
+  function showOrig(img) {
+    const p = $('origPreview');
+    p.src = img.src;
+    p.style.display = 'block';
+    $('dropText').style.display = 'none';
   }
 
-  // ===== PRICE TAGS =====
-  function drawPrice(text, x, y, bg){
-    if(!text) return;
-    ctx.font = 'bold 36px Arial';
-    const tw = ctx.measureText(text).width + 28;
-    ctx.fillStyle = bg || '#e53935';
-    roundRect(ctx, x, y, tw, 52, 8);
-    ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.fillText(text, x+14, y+36);
+  // ---- Style buttons ----
+  document.querySelectorAll('#styleBtns button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#styleBtns button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentStyle = parseInt(btn.dataset.s, 10);
+      render();
+    });
+  });
+
+  // Badge quick picks
+  document.querySelectorAll('#badgeQuick button').forEach(btn => {
+    btn.addEventListener('click', () => { $('badge').value = btn.dataset.b; render(); });
+  });
+
+  // Live update on all controls
+  const liveIds = ['headline','price','badge','duration','bgIntensity','prodSize','prodX','prodY','prodRot',
+    'headSize','headX','headY','showArrow','arrowX','arrowY','showCircle','circX','circY','circSize'];
+  liveIds.forEach(id => {
+    const el = $(id);
+    if (!el) return;
+    el.addEventListener('input', render);
+    el.addEventListener('change', render);
+  });
+
+  // ---- Drawing helpers ----
+  function roundRect(c, x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    c.beginPath();
+    c.moveTo(x + r, y);
+    c.arcTo(x + w, y, x + w, y + h, r);
+    c.arcTo(x + w, y + h, x, y + h, r);
+    c.arcTo(x, y + h, x, y, r);
+    c.arcTo(x, y, x + w, y, r);
+    c.closePath();
   }
 
-  if(tpl === 'amazon'){
-    // Amazon style yellow
-    ctx.font = 'bold 44px Arial';
-    const tw = ctx.measureText(p1).width + 36;
-    ctx.fillStyle = '#ffcc00';
-    roundRect(ctx, 40, 120, tw, 62, 10);
-    ctx.fill();
-    ctx.fillStyle = '#000';
-    ctx.fillText(p1, 58, 163);
-  } else {
-    drawPrice(p1, 40, 130, '#e53935');
-    if(p2) drawPrice(p2, 40, 200, '#1565c0');
+  function drawBackground(c, style, intensity) {
+    const s = STYLES[style];
+    const t = intensity / 100;
+
+    // Base gradient
+    const g = c.createLinearGradient(0, 0, W, H);
+    g.addColorStop(0, s.bg[0]);
+    g.addColorStop(0.5, s.bg[1]);
+    g.addColorStop(1, s.bg[2]);
+    c.fillStyle = g;
+    c.fillRect(0, 0, W, H);
+
+    // Large radial glow
+    const rg = c.createRadialGradient(W * 0.75, H * 0.4, 40, W * 0.75, H * 0.4, 520);
+    rg.addColorStop(0, s.glow);
+    rg.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = rg;
+    c.fillRect(0, 0, W, H);
+
+    // Secondary glow left
+    const rg2 = c.createRadialGradient(W * 0.15, H * 0.7, 20, W * 0.15, H * 0.7, 380);
+    rg2.addColorStop(0, s.glow);
+    rg2.addColorStop(1, 'rgba(0,0,0,0)');
+    c.globalAlpha = 0.6 * t;
+    c.fillStyle = rg2;
+    c.fillRect(0, 0, W, H);
+    c.globalAlpha = 1;
+
+    // Diagonal stripes / tech lines
+    c.save();
+    c.globalAlpha = 0.08 * t;
+    c.strokeStyle = s.accent;
+    c.lineWidth = 2;
+    for (let i = -H; i < W + H; i += 48) {
+      c.beginPath();
+      c.moveTo(i, 0);
+      c.lineTo(i + H, H);
+      c.stroke();
+    }
+    c.restore();
+
+    // Circles / abstract shapes
+    c.save();
+    c.globalAlpha = 0.12 * t;
+    c.strokeStyle = s.accent;
+    c.lineWidth = 3;
+    c.beginPath(); c.arc(W * 0.2, H * 0.25, 90, 0, Math.PI * 2); c.stroke();
+    c.beginPath(); c.arc(W * 0.85, H * 0.8, 120, 0, Math.PI * 2); c.stroke();
+    c.globalAlpha = 0.06 * t;
+    c.fillStyle = s.accent;
+    c.beginPath(); c.arc(W * 0.5, H * 0.9, 200, 0, Math.PI * 2); c.fill();
+    c.restore();
+
+    // Subtle grid for tech feel
+    if (style === 1 || style === 4) {
+      c.save();
+      c.globalAlpha = 0.05 * t;
+      c.strokeStyle = '#fff';
+      c.lineWidth = 1;
+      for (let x = 0; x < W; x += 40) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, H); c.stroke(); }
+      for (let y = 0; y < H; y += 40) { c.beginPath(); c.moveTo(0, y); c.lineTo(W, y); c.stroke(); }
+      c.restore();
+    }
   }
 
-  // ===== RED ARROW =====
-  if(document.getElementById('showArrow').checked){
-    ctx.fillStyle = '#ff1744';
-    ctx.beginPath();
-    ctx.moveTo(280, 280);
-    ctx.lineTo(380, 320);
-    ctx.lineTo(280, 360);
-    ctx.closePath();
-    ctx.fill();
-    // arrow body
-    ctx.fillRect(180, 305, 110, 30);
+  function drawProduct(c, img, opts) {
+    if (!img) return;
+    const sizePct = opts.size / 100;
+    const targetW = W * sizePct;
+    const ar = img.naturalWidth / img.naturalHeight;
+    let dw = targetW;
+    let dh = targetW / ar;
+    // Cap height so product stays in frame
+    if (dh > H * 0.92) {
+      dh = H * 0.92;
+      dw = dh * ar;
+    }
+
+    const cx = (opts.x / 100) * W;
+    const cy = (opts.y / 100) * H;
+    const rot = (opts.rot * Math.PI) / 180;
+
+    c.save();
+    c.translate(cx, cy);
+    c.rotate(rot);
+
+    // Soft glow / drop shadow
+    c.shadowColor = 'rgba(0,0,0,0.55)';
+    c.shadowBlur = 36;
+    c.shadowOffsetX = 12;
+    c.shadowOffsetY = 18;
+
+    // Outer glow ring
+    c.save();
+    c.shadowColor = opts.glowColor || 'rgba(0,200,255,0.5)';
+    c.shadowBlur = 48;
+    c.shadowOffsetX = 0;
+    c.shadowOffsetY = 0;
+    c.drawImage(img, -dw / 2, -dh / 2, dw, dh);
+    c.restore();
+
+    // White subtle border
+    c.shadowColor = 'transparent';
+    c.shadowBlur = 0;
+    c.lineWidth = 4;
+    c.strokeStyle = 'rgba(255,255,255,0.35)';
+    // Approximate outline by drawing image then stroke isn't perfect; use a thin rect-like path
+    c.drawImage(img, -dw / 2, -dh / 2, dw, dh);
+
+    c.restore();
   }
 
-  // ===== DURATION =====
-  if(dur){
-    ctx.font = 'bold 32px Arial';
-    const dw = ctx.measureText(dur).width + 28;
-    ctx.fillStyle = 'rgba(0,0,0,0.85)';
-    roundRect(ctx, W-dw-25, H-60, dw, 42, 6);
-    ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.fillText(dur, W-dw-11, H-30);
+  function wrapText(c, text, maxWidth) {
+    const words = text.split(/\s+/);
+    const lines = [];
+    let line = '';
+    for (let i = 0; i < words.length; i++) {
+      const test = line ? line + ' ' + words[i] : words[i];
+      if (c.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = words[i];
+      } else {
+        line = test;
+      }
+    }
+    if (line) lines.push(line);
+    // Force max 3 lines by merging if needed
+    while (lines.length > 3) {
+      lines[2] = lines[2] + ' ' + lines[3];
+      lines.splice(3, 1);
+    }
+    return lines;
   }
 
-  document.getElementById('result').style.display = 'block';
-  document.getElementById('dl').onclick = () => {
-    canvas.toBlob(b => {
-      if(typeof bgDownloadBlob === 'function') bgDownloadBlob(b, 'gadget-thumbnail-1280x720.png');
+  function drawHeadline(c, text, style, opts) {
+    const s = STYLES[style];
+    let t = (text || '').trim() || 'GADGET REVIEW';
+    t = t.toUpperCase();
+
+    const fontSize = opts.size;
+    c.font = `bold ${fontSize}px "Arial Black", Impact, Arial, sans-serif`;
+    c.textAlign = 'left';
+    c.textBaseline = 'top';
+    c.lineJoin = 'round';
+    c.lineCap = 'round';
+
+    const maxW = W * 0.52;
+    const lines = wrapText(c, t, maxW);
+    const lineH = fontSize * 1.12;
+    const x = (opts.x / 100) * W;
+    let y = (opts.y / 100) * H;
+
+    // Optional highlight bar behind first line for pop
+    if (lines.length) {
+      const tw = c.measureText(lines[0]).width;
+      c.save();
+      c.fillStyle = s.headHighlight;
+      c.globalAlpha = 0.85;
+      roundRect(c, x - 8, y - 4, tw + 16, fontSize + 10, 8);
+      c.fill();
+      c.restore();
+    }
+
+    lines.forEach((line, i) => {
+      const ly = y + i * lineH;
+      // Heavy stroke
+      c.strokeStyle = s.headStroke;
+      c.lineWidth = Math.max(8, fontSize * 0.14);
+      c.strokeText(line, x, ly);
+      // Fill
+      c.fillStyle = i === 0 ? s.headFill : s.headFill;
+      // Alternate: second line can use highlight color for variety
+      if (i === 1 && lines.length > 1) c.fillStyle = s.headHighlight;
+      c.fillText(line, x, ly);
+      // Soft shadow layer
+      c.save();
+      c.shadowColor = 'rgba(0,0,0,0.5)';
+      c.shadowBlur = 8;
+      c.shadowOffsetX = 3;
+      c.shadowOffsetY = 4;
+      c.fillText(line, x, ly);
+      c.restore();
+    });
+  }
+
+  function drawPriceBadge(c, price, style) {
+    if (!price || !price.trim()) return;
+    const s = STYLES[style];
+    const text = price.trim();
+    c.font = 'bold 48px "Arial Black", Impact, Arial, sans-serif';
+    const tw = c.measureText(text).width;
+    const padX = 28, padY = 16;
+    const bw = tw + padX * 2;
+    const bh = 48 + padY * 2;
+    const x = 40, y = H - 160;
+
+    c.save();
+    c.translate(x + bw / 2, y + bh / 2);
+    c.rotate(-0.08);
+    // Shadow
+    c.shadowColor = 'rgba(0,0,0,0.45)';
+    c.shadowBlur = 16;
+    c.shadowOffsetX = 6;
+    c.shadowOffsetY = 8;
+    // Badge body
+    c.fillStyle = s.priceBg;
+    roundRect(c, -bw / 2, -bh / 2, bw, bh, 14);
+    c.fill();
+    // Outline
+    c.shadowColor = 'transparent';
+    c.strokeStyle = '#111';
+    c.lineWidth = 4;
+    roundRect(c, -bw / 2, -bh / 2, bw, bh, 14);
+    c.stroke();
+    // Text
+    c.fillStyle = (s.priceBg === '#ffeb3b' || s.priceBg === '#00ffcc') ? '#111' : '#fff';
+    c.textAlign = 'center';
+    c.textBaseline = 'middle';
+    c.fillText(text, 0, 2);
+    c.restore();
+  }
+
+  function drawSmallBadge(c, text, style) {
+    if (!text || !text.trim()) return;
+    const s = STYLES[style];
+    const t = text.trim().toUpperCase();
+    c.font = 'bold 26px Arial Black, Arial, sans-serif';
+    const tw = c.measureText(t).width;
+    const bw = tw + 28, bh = 40;
+    const x = 40, y = 40;
+
+    c.save();
+    c.shadowColor = 'rgba(0,0,0,0.35)';
+    c.shadowBlur = 10;
+    c.fillStyle = s.badgeBg;
+    roundRect(c, x, y, bw, bh, 8);
+    c.fill();
+    c.shadowColor = 'transparent';
+    c.fillStyle = (s.badgeBg === '#00e5ff' || s.badgeBg === '#00ffcc') ? '#001a14' : '#fff';
+    c.textAlign = 'left';
+    c.textBaseline = 'middle';
+    c.fillText(t, x + 14, y + bh / 2 + 1);
+    c.restore();
+  }
+
+  function drawDuration(c, dur) {
+    if (!dur || !dur.trim()) return;
+    const t = dur.trim();
+    c.font = 'bold 28px Arial, sans-serif';
+    const tw = c.measureText(t).width;
+    const bw = tw + 24, bh = 38;
+    const x = W - bw - 22, y = H - bh - 18;
+    c.fillStyle = 'rgba(0,0,0,0.82)';
+    roundRect(c, x, y, bw, bh, 6);
+    c.fill();
+    c.fillStyle = '#fff';
+    c.textAlign = 'left';
+    c.textBaseline = 'middle';
+    c.fillText(t, x + 12, y + bh / 2 + 1);
+  }
+
+  function drawArrow(c, opts) {
+    const ax = (opts.x / 100) * W;
+    const ay = (opts.y / 100) * H;
+    const scale = 1.15;
+
+    c.save();
+    c.translate(ax, ay);
+    c.rotate(-0.25);
+    c.scale(scale, scale);
+
+    // Shadow
+    c.shadowColor = 'rgba(0,0,0,0.5)';
+    c.shadowBlur = 12;
+    c.shadowOffsetX = 4;
+    c.shadowOffsetY = 6;
+
+    // Arrow shape (YouTube-style annotation)
+    c.beginPath();
+    c.moveTo(0, -28);
+    c.lineTo(70, 0);
+    c.lineTo(0, 28);
+    c.lineTo(12, 10);
+    c.lineTo(-55, 10);
+    c.lineTo(-55, -10);
+    c.lineTo(12, -10);
+    c.closePath();
+
+    c.fillStyle = '#ff1744';
+    c.fill();
+    c.shadowColor = 'transparent';
+    c.strokeStyle = '#1a0000';
+    c.lineWidth = 5;
+    c.stroke();
+
+    // Inner highlight
+    c.strokeStyle = 'rgba(255,255,255,0.35)';
+    c.lineWidth = 2;
+    c.stroke();
+    c.restore();
+  }
+
+  function drawCircle(c, opts, style) {
+    const s = STYLES[style];
+    const cx = (opts.x / 100) * W;
+    const cy = (opts.y / 100) * H;
+    const r = opts.size / 2;
+
+    c.save();
+    c.translate(cx, cy);
+    c.rotate(-0.12);
+    c.strokeStyle = s.accent;
+    c.lineWidth = 10;
+    c.shadowColor = 'rgba(0,0,0,0.4)';
+    c.shadowBlur = 8;
+    c.beginPath();
+    c.ellipse(0, 0, r, r * 0.92, 0, 0, Math.PI * 2);
+    c.stroke();
+    // dashed inner
+    c.setLineDash([14, 10]);
+    c.lineWidth = 3;
+    c.strokeStyle = '#fff';
+    c.beginPath();
+    c.ellipse(0, 0, r - 12, (r - 12) * 0.92, 0, 0, Math.PI * 2);
+    c.stroke();
+    c.restore();
+  }
+
+  // ---- Main render ----
+  function getOpts() {
+    return {
+      style: currentStyle,
+      intensity: parseInt($('bgIntensity').value, 10),
+      size: parseInt($('prodSize').value, 10),
+      x: parseInt($('prodX').value, 10),
+      y: parseInt($('prodY').value, 10),
+      rot: parseInt($('prodRot').value, 10),
+      headSize: parseInt($('headSize').value, 10),
+      headX: parseInt($('headX').value, 10),
+      headY: parseInt($('headY').value, 10),
+      showArrow: $('showArrow').checked,
+      arrowX: parseInt($('arrowX').value, 10),
+      arrowY: parseInt($('arrowY').value, 10),
+      showCircle: $('showCircle').checked,
+      circX: parseInt($('circX').value, 10),
+      circY: parseInt($('circY').value, 10),
+      circSize: parseInt($('circSize').value, 10),
+      headline: $('headline').value,
+      price: $('price').value,
+      badge: $('badge').value,
+      duration: $('duration').value
+    };
+  }
+
+  function renderTo(canvas, opts, layoutOverride) {
+    const c = canvas.getContext('2d');
+    canvas.width = W;
+    canvas.height = H;
+    const s = STYLES[opts.style];
+
+    // Layout overrides for variations
+    let o = Object.assign({}, opts);
+    if (layoutOverride === 1) {
+      // Product right, headline left (default-ish)
+      o.x = 72; o.y = 50; o.size = 58; o.headX = 5; o.headY = 16;
+    } else if (layoutOverride === 2) {
+      // Product center, headline top
+      o.x = 55; o.y = 58; o.size = 52; o.headX = 8; o.headY = 8; o.rot = 0;
+    } else if (layoutOverride === 3) {
+      // Product left, headline right
+      o.x = 28; o.y = 52; o.size = 55; o.headX = 48; o.headY = 18; o.rot = 5;
+    }
+
+    drawBackground(c, o.style, o.intensity);
+
+    // Circle under product sometimes looks better
+    if (o.showCircle) {
+      drawCircle(c, { x: o.circX, y: o.circY, size: o.circSize }, o.style);
+    }
+
+    if (productImg) {
+      drawProduct(c, productImg, {
+        size: o.size, x: o.x, y: o.y, rot: o.rot,
+        glowColor: s.glow
+      });
+    } else {
+      // Placeholder
+      c.fillStyle = 'rgba(255,255,255,0.15)';
+      roundRect(c, W * 0.45, H * 0.2, W * 0.45, H * 0.6, 16);
+      c.fill();
+      c.fillStyle = 'rgba(255,255,255,0.5)';
+      c.font = '28px Arial';
+      c.textAlign = 'center';
+      c.fillText('Upload gadget image', W * 0.675, H * 0.5);
+    }
+
+    if (o.showArrow) {
+      drawArrow(c, { x: o.arrowX, y: o.arrowY });
+    }
+
+    drawHeadline(c, o.headline, o.style, { size: o.headSize, x: o.headX, y: o.headY });
+    drawSmallBadge(c, o.badge, o.style);
+    drawPriceBadge(c, o.price, o.style);
+    drawDuration(c, o.duration);
+  }
+
+  function render() {
+    const opts = getOpts();
+    renderTo(mainCanvas, opts, null);
+  }
+
+  // ---- Buttons ----
+  $('btnGenerate').addEventListener('click', () => {
+    if (!productImg) { showMsg('Please upload a gadget image first.'); return; }
+    render();
+  });
+
+  $('btnVariations').addEventListener('click', () => {
+    if (!productImg) { showMsg('Please upload a gadget image first.'); return; }
+    const box = $('variations');
+    box.innerHTML = '';
+    $('variationsBox').style.display = 'block';
+    const opts = getOpts();
+
+    for (let i = 1; i <= 3; i++) {
+      const card = document.createElement('div');
+      card.className = 'gtm-var-card';
+      const cv = document.createElement('canvas');
+      cv.width = W; cv.height = H;
+      // Slight style shift per variation for variety
+      const vOpts = Object.assign({}, opts);
+      if (i === 2) vOpts.style = ((opts.style % 5) + 1);
+      if (i === 3) vOpts.style = (((opts.style + 1) % 5) + 1);
+      renderTo(cv, vOpts, i);
+
+      const actions = document.createElement('div');
+      actions.className = 'gtm-var-actions';
+      const useBtn = document.createElement('button');
+      useBtn.className = 'btn';
+      useBtn.textContent = 'Use This';
+      useBtn.type = 'button';
+      useBtn.onclick = () => {
+        // Copy this canvas to main
+        ctx.clearRect(0, 0, W, H);
+        ctx.drawImage(cv, 0, 0);
+        // Also sync some slider values roughly
+        if (i === 1) { $('prodX').value = 72; $('headX').value = 5; }
+        if (i === 2) { $('prodX').value = 55; $('headY').value = 8; }
+        if (i === 3) { $('prodX').value = 28; $('headX').value = 48; }
+      };
+      const dlBtn = document.createElement('button');
+      dlBtn.className = 'btn secondary';
+      dlBtn.textContent = 'Download PNG';
+      dlBtn.type = 'button';
+      dlBtn.onclick = () => downloadCanvas(cv, 'png');
+      actions.appendChild(useBtn);
+      actions.appendChild(dlBtn);
+      card.appendChild(cv);
+      card.appendChild(actions);
+      box.appendChild(card);
+    }
+  });
+
+  function downloadCanvas(canvas, type) {
+    if (!productImg) { showMsg('Please upload a gadget image first.'); return; }
+    const mime = type === 'jpg' ? 'image/jpeg' : 'image/png';
+    const name = type === 'jpg' ? 'gadget-thumbnail-1280x720.jpg' : 'gadget-thumbnail-1280x720.png';
+    canvas.toBlob(blob => {
+      if (!blob) { showMsg('Export failed.'); return; }
+      if (typeof bgDownloadBlob === 'function') bgDownloadBlob(blob, name);
       else {
         const a = document.createElement('a');
-        a.href = URL.createObjectURL(b);
-        a.download = 'gadget-thumbnail-1280x720.png';
+        a.href = URL.createObjectURL(blob);
+        a.download = name;
         a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
       }
-    }, 'image/png', 1);
-  };
-}
+    }, mime, type === 'jpg' ? 0.92 : 1);
+  }
+
+  $('btnDlPng').addEventListener('click', () => downloadCanvas(mainCanvas, 'png'));
+  $('btnDlJpg').addEventListener('click', () => downloadCanvas(mainCanvas, 'jpg'));
+
+  // Initial empty preview
+  render();
+})();
 </script>
