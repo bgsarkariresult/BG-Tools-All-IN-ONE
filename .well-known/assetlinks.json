@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.bgsarkariresult.twa",
+        "sha256_cert_fingerprints": ["7F:91:A4:96:BC:18:78:73:2D:05:00:69:B3:B5:9A:14:2C:AE:30:52:D9:EB:BD:0A:75:72:47:70:56:6C:A8:11"]
+      }
+    }]
