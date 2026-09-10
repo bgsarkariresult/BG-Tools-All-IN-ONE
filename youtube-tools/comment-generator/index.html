@@ -1,0 +1,312 @@
+---
+layout: default
+title: YouTube Comment Generator
+category: YouTube Tools
+description: "Free YouTube Comment Generator - Hindi/English natural comments with your video link + smart title based comments."
+keywords: youtube comment generator, free comment generator, hindi english comment
+---
+<div class="tool-card" style="--cat: var(--c-yt);">
+  <h1>💬 YouTube Comment Generator</h1>
+  <p class="desc">Natural Hindi / English comments generate karein. Target video ka title fetch karke smart comments bhi banate hain.</p>
+
+  <label style="font-weight:600;display:block;margin-bottom:6px;">Language</label>
+  <select id="language">
+    <option value="mix">Hinglish (Mix)</option>
+    <option value="hindi">Hindi</option>
+    <option value="english">English</option>
+  </select>
+
+  <label style="font-weight:600;display:block;margin-bottom:6px;margin-top:10px;">Category</label>
+  <select id="category">
+    <option value="tech">Tech / Gadgets</option>
+    <option value="education">Education / Study</option>
+    <option value="entertainment">Entertainment</option>
+    <option value="gaming">Gaming</option>
+    <option value="vlog">Vlog / Lifestyle</option>
+    <option value="motivational">Motivational</option>
+    <option value="news">News / Current Affairs</option>
+    <option value="cooking">Cooking / Food</option>
+    <option value="fitness">Fitness / Health</option>
+    <option value="general">General</option>
+  </select>
+
+  <label style="font-weight:600;display:block;margin-bottom:6px;margin-top:10px;">Target YouTube Video Link</label>
+  <input type="text" id="targetLink" placeholder="https://youtube.com/watch?v=... (title auto fetch hoga)">
+
+  <label style="font-weight:600;display:block;margin-bottom:6px;margin-top:10px;">Aapki Video Link (comment mein add hogi)</label>
+  <input type="text" id="myLink" placeholder="https://youtu.be/your-video">
+
+  <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+    <button class="btn" onclick="generateComments()">Generate Comments</button>
+    <button class="btn secondary" onclick="copyAll()">Copy All</button>
+  </div>
+
+  <div id="titleInfo" style="margin-top:12px;font-size:14px;color:var(--muted);"></div>
+  <div class="result-box" id="result" style="margin-top:16px;min-height:120px;"></div>
+</div>
+
+<script>
+const templates = {
+  mix: {
+    tech: [
+      "Bahut solid information di hai bhai 🔥 Is topic pe maine bhi detailed video banayi hai → ",
+      "Clear explanation! Related topic pe meri video bhi hai, zaroor check karna → ",
+      "Yeh tips kaam aa gaye. Main bhi tech videos banata hoon, latest video dekh lena → ",
+      "Great content. Is field mein meri video bhi hai → ",
+      "Helpful raha. Extra insights ke liye meri video → ",
+      "Pro level breakdown. Maine bhi is pe video banayi hai → ",
+      "Bahut useful. Related gadget pe meri video check karo → "
+    ],
+    education: [
+      "Bohot clear padhaya aapne 👏 Is topic pe meri detailed video bhi hai → ",
+      "Students ke liye perfect. Related notes ke saath meri video → ",
+      "Concept ab clear ho gaya. Extra tips meri video mein hain → ",
+      "Acchi teaching. Main bhi education content banata hoon → ",
+      "Useful explanation. Same topic pe meri video dekh lo → "
+    ],
+    entertainment: [
+      "Maza aa gaya dekh ke 😂 Aise hi content pe meri video bhi hai → ",
+      "Full entertainment! Related video maine bhi banayi hai → ",
+      "Bahut funny. Mera latest video bhi check karo → ",
+      "Solid vibe. Main bhi entertainment videos banata hoon → "
+    ],
+    gaming: [
+      "Kya gameplay hai bhai 🔥 Is game pe meri video bhi hai → ",
+      "Mast tips. Related gameplay meri channel pe → ",
+      "Pro moves. Main bhi gaming content banata hoon → ",
+      "Strategy kaam aa gayi. Extra tips meri video mein → "
+    ],
+    vlog: [
+      "Bahut natural vlog 🔥 Daily life pe meri video bhi hai → ",
+      "Acchi energy. Related vlog check karo → ",
+      "Maza aa gaya. Mera latest vlog bhi dekhna → "
+    ],
+    motivational: [
+      "Bahut powerful message 💪 Is topic pe meri motivational video bhi hai → ",
+      "Inspiration mil gaya. Related video meri channel pe → ",
+      "Dil se touch kiya. Extra motivation ke liye meri video → "
+    ],
+    news: [
+      "Update ke liye thanks. Detailed analysis meri video mein hai → ",
+      "Clear coverage. Related news pe meri video → ",
+      "Helpful raha. Main bhi current affairs cover karta hoon → "
+    ],
+    cooking: [
+      "Recipe perfect lagi 😋 Is dish pe meri video bhi hai → ",
+      "Bahut tasty. Related recipes meri channel pe → ",
+      "Clear steps. Main bhi cooking videos banata hoon → "
+    ],
+    fitness: [
+      "Solid workout tips 💪 Is topic pe meri detailed video hai → ",
+      "Form clear tha. Related fitness video check karo → ",
+      "Motivation mil gaya. Extra tips meri video mein → "
+    ],
+    general: [
+      "Bahut acchi video 🔥 Related topic pe meri video bhi hai → ",
+      "Useful content. Maine bhi is pe video banayi hai → ",
+      "Solid information. Mera latest video dekh lena → ",
+      "Accha laga. Main bhi aise content banata hoon → "
+    ]
+  },
+  hindi: {
+    tech: [
+      "बहुत अच्छी जानकारी दी है भाई 🔥 इस टॉपिक पर मेरी भी डिटेल्ड वीडियो है → ",
+      "क्लियर एक्सप्लेनेशन। संबंधित टॉपिक पर मेरी वीडियो भी देखें → ",
+      "ये टिप्स काम आ गए। मेरी लेटेस्ट वीडियो भी चेक करें → ",
+      "शानदार कंटेंट। इस फील्ड में मेरी वीडियो भी है → "
+    ],
+    education: [
+      "बहुत क्लियर पढ़ाया आपने 👏 इस टॉपिक पर मेरी डिटेल्ड वीडियो है → ",
+      "स्टूडेंट्स के लिए परफेक्ट। संबंधित नोट्स के साथ मेरी वीडियो → ",
+      "कॉन्सेप्ट अब क्लियर हो गया। अतिरिक्त टिप्स मेरी वीडियो में → "
+    ],
+    entertainment: [
+      "मज़ा आ गया देखकर 😂 ऐसे ही कंटेंट पर मेरी वीडियो भी है → ",
+      "फुल एंटरटेनमेंट! संबंधित वीडियो मैंने भी बनाई है → "
+    ],
+    gaming: [
+      "क्या गेमप्ले है भाई 🔥 इस गेम पर मेरी वीडियो भी है → ",
+      "मस्त टिप्स। संबंधित गेमप्ले मेरी चैनल पर → "
+    ],
+    vlog: [
+      "बहुत नेचुरल व्लॉग 🔥 डेली लाइफ पर मेरी वीडियो भी है → ",
+      "अच्छी एनर्जी। संबंधित व्लॉग चेक करें → "
+    ],
+    motivational: [
+      "बहुत पावरफुल मैसेज 💪 इस टॉपिक पर मेरी मोटिवेशनल वीडियो है → ",
+      "इंस्पिरेशन मिल गया। संबंधित वीडियो मेरी चैनल पर → "
+    ],
+    news: [
+      "अपडेट के लिए धन्यवाद। डिटेल्ड एनालिसिस मेरी वीडियो में है → ",
+      "क्लियर कवरेज। संबंधित न्यूज़ पर मेरी वीडियो → "
+    ],
+    cooking: [
+      "रेसिपी परफेक्ट लगी 😋 इस डिश पर मेरी वीडियो भी है → ",
+      "बहुत टेस्टी। संबंधित रेसिपी मेरी चैनल पर → "
+    ],
+    fitness: [
+      "सॉलिड वर्कआउट टिप्स 💪 इस टॉपिक पर मेरी डिटेल्ड वीडियो है → ",
+      "फॉर्म क्लियर था। संबंधित फिटनेस वीडियो चेक करें → "
+    ],
+    general: [
+      "बहुत अच्छी वीडियो 🔥 संबंधित टॉपिक पर मेरी वीडियो भी है → ",
+      "उपयोगी कंटेंट। मैंने भी इस पर वीडियो बनाई है → ",
+      "सॉलिड जानकारी। मेरी लेटेस्ट वीडियो देख लें → "
+    ]
+  },
+  english: {
+    tech: [
+      "Really solid information 🔥 I also made a detailed video on this topic → ",
+      "Clear explanation! Check out my related video as well → ",
+      "These tips were helpful. I cover tech too, here's my latest → ",
+      "Great content. I have a video in this area too → ",
+      "Very useful. Extra insights in my video → "
+    ],
+    education: [
+      "Explained so clearly 👏 I also have a detailed video on this → ",
+      "Perfect for students. Related notes + video here → ",
+      "Concept is clear now. Extra tips in my video → "
+    ],
+    entertainment: [
+      "Had a great time watching 😂 I make similar content too → ",
+      "Full entertainment! Related video on my channel → "
+    ],
+    gaming: [
+      "Insane gameplay 🔥 I also covered this game → ",
+      "Great tips. Related gameplay on my channel → "
+    ],
+    vlog: [
+      "Very natural vlog 🔥 I post similar daily life videos → ",
+      "Good energy. Check my related vlog → "
+    ],
+    motivational: [
+      "Powerful message 💪 I made a motivational video on this too → ",
+      "Got inspired. Related video on my channel → "
+    ],
+    news: [
+      "Thanks for the update. Detailed analysis in my video → ",
+      "Clear coverage. Related news video here → "
+    ],
+    cooking: [
+      "Recipe looks perfect 😋 I also made a video on this dish → ",
+      "Looks delicious. More recipes on my channel → "
+    ],
+    fitness: [
+      "Solid workout tips 💪 Detailed video on this topic here → ",
+      "Form looked clean. Related fitness video → "
+    ],
+    general: [
+      "Really good video 🔥 Related topic video on my channel → ",
+      "Useful content. I also covered this → ",
+      "Solid information. Check my latest video → "
+    ]
+  }
+};
+
+// Smart templates that use video title
+const smartTemplates = {
+  mix: [
+    "\"{title}\" pe bahut accha kaam kiya hai 🔥 Related topic pe meri video bhi hai → ",
+    "Yeh video \"{title}\" ke baare mein solid thi. Maine bhi is pe video banayi hai → ",
+    "\"{title}\" dekh ke help mili. Extra points meri video mein → ",
+    "Acchi coverage of \"{title}\". Main bhi aise content banata hoon → ",
+    "\"{title}\" pe clear info di. Related video check karo → "
+  ],
+  hindi: [
+    "\"{title}\" पर बहुत अच्छा काम किया है 🔥 संबंधित टॉपिक पर मेरी वीडियो भी है → ",
+    "यह वीडियो \"{title}\" के बारे में सॉलिड थी। मैंने भी इस पर वीडियो बनाई है → ",
+    "\"{title}\" देखकर मदद मिली। अतिरिक्त पॉइंट्स मेरी वीडियो में → "
+  ],
+  english: [
+    "Great work on \"{title}\" 🔥 I also made a related video → ",
+    "Really solid video about \"{title}\". I covered this too → ",
+    "\"{title}\" was helpful. Extra points in my video → ",
+    "Nice coverage of \"{title}\". Check my related video → "
+  ]
+};
+
+async function fetchVideoTitle(url) {
+  if (!url || !url.includes('youtu')) return null;
+  try {
+    const res = await fetch(`https://noembed.com/embed?url=${encodeURIComponent(url)}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.title || null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function pick(arr, n = 5) {
+  const shuffled = [...arr].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, Math.min(n, arr.length));
+}
+
+async function generateComments() {
+  const lang = document.getElementById('language').value;
+  const category = document.getElementById('category').value;
+  const targetLink = document.getElementById('targetLink').value.trim();
+  const myLink = document.getElementById('myLink').value.trim();
+  const result = document.getElementById('result');
+  const titleInfo = document.getElementById('titleInfo');
+
+  if (!myLink) {
+    result.innerHTML = '<span style="color:#c00;">Pehle apni video link daalein.</span>';
+    return;
+  }
+
+  result.innerHTML = 'Generating...';
+  titleInfo.textContent = '';
+
+  let title = null;
+  if (targetLink) {
+    titleInfo.textContent = 'Fetching video title...';
+    title = await fetchVideoTitle(targetLink);
+    if (title) {
+      titleInfo.textContent = `✅ Title: ${title}`;
+    } else {
+      titleInfo.textContent = '⚠️ Title fetch nahi hua (normal templates use ho rahe hain)';
+    }
+  }
+
+  const baseList = (templates[lang] && templates[lang][category]) || templates.mix.general;
+  let comments = [];
+
+  // Smart comments if title available
+  if (title) {
+    const smartList = smartTemplates[lang] || smartTemplates.mix;
+    const smartOnes = pick(smartList, 3).map(t => t.replace('{title}', title) + myLink);
+    comments = comments.concat(smartOnes);
+  }
+
+  // Regular comments
+  const regular = pick(baseList, 5 - comments.length).map(t => t + myLink);
+  comments = comments.concat(regular);
+
+  // Render
+  result.innerHTML = comments.map((c, i) => `
+    <div style="background:#fff;border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;">
+      <div style="font-size:14px;margin-bottom:8px;white-space:pre-wrap;">${c}</div>
+      <button class="btn secondary" style="padding:6px 14px;font-size:13px;" onclick="copyOne(this, \`${c.replace(/`/g, '\\`')}\`)">Copy</button>
+    </div>
+  `).join('');
+}
+
+function copyOne(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const old = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = old, 1500);
+  });
+}
+
+function copyAll() {
+  const boxes = document.querySelectorAll('#result > div > div:first-child');
+  if (!boxes.length) {
+    alert('Pehle comments generate karein.');
+    return;
+  }
+  const all = Array.from(boxes).map(b => b.textContent.trim()).join('\n\n');
+  navigator.clipboard.writeText(all).then(() => alert('Saare comments copy ho gaye!'));
+}
+</script>
