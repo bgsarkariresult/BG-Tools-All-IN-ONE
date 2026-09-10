@@ -4,11 +4,13 @@
   "description": "YouTube, Image, Video, PDF, Text aur Calculator tools - 45+ tools, 100% free, no signup",
   "start_url": "/BG-Tools-All-IN-ONE/",
   "scope": "/BG-Tools-All-IN-ONE/",
+  "id": "/BG-Tools-All-IN-ONE/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#3B5BFE",
   "lang": "hi",
+  "categories": ["utilities", "productivity"],
   "icons": [
     {
       "src": "/BG-Tools-All-IN-ONE/icons/icon-192.png",
@@ -33,6 +35,30 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "YouTube Tools",
+      "url": "/BG-Tools-All-IN-ONE/youtube-tools/",
+      "description": "YouTube ke liye tools",
+      "icons": [
+        {
+          "src": "/BG-Tools-All-IN-ONE/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Image Tools",
+      "url": "/BG-Tools-All-IN-ONE/image-tools/",
+      "description": "Image editing tools",
+      "icons": [
+        {
+          "src": "/BG-Tools-All-IN-ONE/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }
