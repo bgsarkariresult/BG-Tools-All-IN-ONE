@@ -2,7 +2,7 @@
       "relation": ["delegate_permission/common.handle_all_urls"],
       "target": {
         "namespace": "android_app",
-        "package_name": "io.github.bgsarkariresult.twa",
-        "sha256_cert_fingerprints": ["15:38:99:62:65:F2:15:02:87:E2:C7:F7:FE:10:6B:65:DC:E1:27:08:C9:E8:33:68:A4:D8:73:28:5E:91:33:51"]
+        "package_name": "com.bgtools.app",
+        "sha256_cert_fingerprints": ["61:2F:7C:44:06:95:C5:D1:2E:B4:BA:31:4B:AB:A9:10:BA:FC:AC:64:A0:C5:2B:46:7F:AF:BF:17:ED:CE:D9:FF"]
       }
     }]
