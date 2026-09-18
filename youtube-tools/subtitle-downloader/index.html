@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YT Subtitle Downloader</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Hind:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d0f10;
+    --panel:#16191b;
+    --panel-2:#1e2224;
+    --line:#2b3033;
+    --text:#eceeef;
+    --muted:#9aa3a8;
+    --gold:#e8b84b;
+    --gold-dim:#7a6430;
+    --error:#e5675f;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at 50% -10%, rgba(232,184,75,0.08), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Hind',sans-serif;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    padding:48px 18px 80px;
+  }
+  .wrap{width:100%;max-width:640px;}
+
+  .brand{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    margin-bottom:6px;
+  }
+  .brand .cc{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    letter-spacing:0.06em;
+    color:var(--bg);
+    background:var(--gold);
+    padding:2px 7px;
+    border-radius:3px;
+    font-weight:500;
+  }
+  h1{
+    font-family:'Bebas Neue',sans-serif;
+    font-size:44px;
+    letter-spacing:0.01em;
+    margin:10px 0 4px;
+    line-height:1;
+  }
+  .sub{
+    color:var(--muted);
+    font-size:16px;
+    margin:0 0 34px;
+    max-width:52ch;
+  }
+
+  .caption-strip{
+    display:flex;
+    gap:5px;
+    margin-bottom:28px;
+    height:6px;
+  }
+  .caption-strip span{
+    flex:1;
+    background:var(--panel-2);
+    border-radius:2px;
+    animation: rise 1.1s ease forwards;
+    transform-origin:bottom;
+    transform:scaleY(0);
+  }
+  .caption-strip span:nth-child(1){animation-delay:.02s;background:var(--gold-dim);}
+  .caption-strip span:nth-child(2){animation-delay:.08s;}
+  .caption-strip span:nth-child(3){animation-delay:.14s;background:var(--gold);}
+  .caption-strip span:nth-child(4){animation-delay:.20s;}
+  .caption-strip span:nth-child(5){animation-delay:.26s;background:var(--gold-dim);}
+  .caption-strip span:nth-child(6){animation-delay:.32s;}
+  .caption-strip span:nth-child(7){animation-delay:.38s;background:var(--gold);}
+  @keyframes rise{to{transform:scaleY(1);}}
+  @media (prefers-reduced-motion: reduce){
+    .caption-strip span{animation:none;transform:scaleY(1);}
+  }
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:26px;
+  }
+
+  label{
+    display:block;
+    font-size:14px;
+    color:var(--muted);
+    margin-bottom:8px;
+  }
+
+  .row{display:flex;gap:10px;}
+  input[type=text]{
+    flex:1;
+    background:var(--bg);
+    border:1px solid var(--line);
+    color:var(--text);
+    padding:13px 14px;
+    border-radius:7px;
+    font-size:15px;
+    font-family:'JetBrains Mono',monospace;
+  }
+  input[type=text]:focus{outline:none;border-color:var(--gold-dim);}
+
+  button{
+    font-family:'Hind',sans-serif;
+    font-weight:600;
+    font-size:15px;
+    border:none;
+    border-radius:7px;
+    cursor:pointer;
+    transition:filter .15s ease;
+  }
+  button:hover{filter:brightness(1.08);}
+  button:disabled{opacity:.5;cursor:not-allowed;filter:none;}
+
+  .btn-primary{
+    background:var(--gold);
+    color:#191305;
+    padding:13px 22px;
+    white-space:nowrap;
+  }
+
+  .status{
+    margin-top:16px;
+    font-size:14px;
+    color:var(--muted);
+    min-height:20px;
+  }
+  .status.err{color:var(--error);}
+
+  .result{
+    margin-top:22px;
+    padding-top:22px;
+    border-top:1px solid var(--line);
+    display:none;
+  }
+  .result.show{display:block;}
+
+  .field{margin-bottom:18px;}
+  select{
+    width:100%;
+    background:var(--bg);
+    border:1px solid var(--line);
+    color:var(--text);
+    padding:12px 14px;
+    border-radius:7px;
+    font-size:15px;
+    font-family:'Hind',sans-serif;
+  }
+
+  .fmt-group{display:flex;gap:8px;}
+  .fmt-btn{
+    flex:1;
+    background:var(--bg);
+    border:1px solid var(--line);
+    color:var(--muted);
+    padding:11px;
+    border-radius:7px;
+    font-size:14px;
+  }
+  .fmt-btn.active{
+    border-color:var(--gold);
+    color:var(--gold);
+    background:rgba(232,184,75,0.08);
+  }
+
+  .download-btn{
+    width:100%;
+    padding:14px;
+    margin-top:6px;
+    font-size:16px;
+  }
+
+  .preview{
+    margin-top:16px;
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:7px;
+    padding:14px;
+    max-height:180px;
+    overflow-y:auto;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    color:var(--muted);
+    white-space:pre-wrap;
+    line-height:1.6;
+  }
+
+  .note{
+    margin-top:22px;
+    font-size:13px;
+    color:var(--muted);
+    line-height:1.7;
+  }
+  .note b{color:var(--text);}
+
+  .spinner{
+    display:inline-block;
+    width:14px;height:14px;
+    border:2px solid var(--gold-dim);
+    border-top-color:var(--gold);
+    border-radius:50%;
+    animation:spin .7s linear infinite;
+    vertical-align:middle;
+    margin-right:8px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand"><span class="cc">CC</span></div>
+  <h1>YT Subtitle Downloader</h1>
+  <p class="sub">कोई भी YouTube video link paste karo, uski subtitles seedha SRT ya TXT file mein download karo.</p>
+
+  <div class="caption-strip">
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <div class="card">
+    <label for="ytUrl">YouTube video link</label>
+    <div class="row">
+      <input type="text" id="ytUrl" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off">
+      <button class="btn-primary" id="fetchBtn">Subtitles dhoondo</button>
+    </div>
+    <div class="status" id="status"></div>
+
+    <div class="result" id="result">
+      <div class="field">
+        <label for="langSelect">Language chuno</label>
+        <select id="langSelect"></select>
+      </div>
+
+      <div class="field">
+        <label>Format</label>
+        <div class="fmt-group">
+          <button class="fmt-btn active" data-fmt="srt">SRT (timestamps ke saath)</button>
+          <button class="fmt-btn" data-fmt="txt">TXT (sirf text)</button>
+        </div>
+      </div>
+
+      <button class="btn-primary download-btn" id="downloadBtn">Load karo aur download karo</button>
+      <div class="status" id="status2"></div>
+      <div class="preview" id="preview" style="display:none;"></div>
+    </div>
+
+    <div class="note">
+      <b>Note:</b> ye tool YouTube ke public caption data ko ek CORS proxy ke through fetch karta hai. Agar kisi video par subtitles off hain ya proxy busy hai, to result nahi milega — thodi der baad phir try karo.
+    </div>
+  </div>
+
+</div>
+
+<script>
+const PROXIES = [
+  url => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
+  url => 'https://corsproxy.io/?' + encodeURIComponent(url)
+];
+
+let currentVideoId = null;
+let currentTracks = [];
+let activeFmt = 'srt';
+
+function extractVideoId(input){
+  input = input.trim();
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=)([\w-]{11})/,
+    /(?:youtu\.be\/)([\w-]{11})/,
+    /(?:youtube\.com\/shorts\/)([\w-]{11})/,
+    /(?:youtube\.com\/embed\/)([\w-]{11})/,
+    /^([\w-]{11})$/
+  ];
+  for(const p of patterns){
+    const m = input.match(p);
+    if(m) return m[1];
+  }
+  return null;
+}
+
+async function fetchViaProxies(targetUrl){
+  let lastErr;
+  for(const build of PROXIES){
+    try{
+      const res = await fetch(build(targetUrl));
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const text = await res.text();
+      if(!text || text.length < 5) throw new Error('empty');
+      return text;
+    }catch(e){
+      lastErr = e;
+    }
+  }
+  throw lastErr || new Error('all proxies failed');
+}
+
+function decodeEntities(str){
+  const ta = document.createElement('textarea');
+  ta.innerHTML = str;
+  return ta.value;
+}
+
+function parseTrackList(xmlText){
+  const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
+  const nodes = [...doc.getElementsByTagName('track')];
+  return nodes.map(n => ({
+    lang: n.getAttribute('lang_code'),
+    name: n.getAttribute('name') || n.getAttribute('lang_code'),
+    kind: n.getAttribute('kind') || ''
+  }));
+}
+
+function secToTimestamp(sec){
+  const h = Math.floor(sec/3600);
+  const m = Math.floor((sec%3600)/60);
+  const s = Math.floor(sec%60);
+  const ms = Math.round((sec - Math.floor(sec))*1000);
+  const pad = (n,l=2)=>String(n).padStart(l,'0');
+  return `${pad(h)}:${pad(m)}:${pad(s)},${pad(ms,3)}`;
+}
+
+function parseCaptionsXml(xmlText){
+  const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
+  const texts = [...doc.getElementsByTagName('text')];
+  return texts.map(t => ({
+    start: parseFloat(t.getAttribute('start') || '0'),
+    dur: parseFloat(t.getAttribute('dur') || '2'),
+    text: decodeEntities(t.textContent || '').replace(/\n/g,' ').trim()
+  })).filter(c => c.text.length > 0);
+}
+
+function toSRT(cues){
+  return cues.map((c,i) => {
+    const start = secToTimestamp(c.start);
+    const end = secToTimestamp(c.start + c.dur);
+    return `${i+1}\n${start} --> ${end}\n${c.text}\n`;
+  }).join('\n');
+}
+
+function toTXT(cues){
+  return cues.map(c => c.text).join('\n');
+}
+
+function setStatus(el, msg, isErr=false){
+  el.textContent = msg;
+  el.className = 'status' + (isErr ? ' err' : '');
+}
+
+document.getElementById('fetchBtn').addEventListener('click', async () => {
+  const input = document.getElementById('ytUrl').value;
+  const status = document.getElementById('status');
+  const resultBox = document.getElementById('result');
+  resultBox.classList.remove('show');
+
+  const vid = extractVideoId(input);
+  if(!vid){
+    setStatus(status, 'Sahi YouTube link daalo (watch, youtu.be ya shorts link chalega).', true);
+    return;
+  }
+  currentVideoId = vid;
+
+  setStatus(status, '⏳ Track list dhoond rahe hain...');
+  document.getElementById('fetchBtn').disabled = true;
+
+  try{
+    const listUrl = `https://video.google.com/timedtext?type=list&v=${vid}`;
+    const xml = await fetchViaProxies(listUrl);
+    const tracks = parseTrackList(xml);
+
+    if(tracks.length === 0){
+      setStatus(status, 'Is video ke liye koi subtitles nahi mile (shayad channel ne disable kiya hai).', true);
+      document.getElementById('fetchBtn').disabled = false;
+      return;
+    }
+
+    currentTracks = tracks;
+    const sel = document.getElementById('langSelect');
+    sel.innerHTML = tracks.map((t,i) =>
+      `<option value="${i}">${t.name}${t.kind === 'asr' ? ' (auto-generated)' : ''}</option>`
+    ).join('');
+
+    resultBox.classList.add('show');
+    setStatus(status, `✔ ${tracks.length} language track(s) mil gaye.`);
+  }catch(e){
+    setStatus(status, 'Fetch fail ho gaya — proxy shayad down hai, thodi der baad try karo.', true);
+  }finally{
+    document.getElementById('fetchBtn').disabled = false;
+  }
+});
+
+document.querySelectorAll('.fmt-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.fmt-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFmt = btn.dataset.fmt;
+  });
+});
+
+document.getElementById('downloadBtn').addEventListener('click', async () => {
+  const status2 = document.getElementById('status2');
+  const preview = document.getElementById('preview');
+  const idx = document.getElementById('langSelect').value;
+  const track = currentTracks[idx];
+  if(!track || !currentVideoId) return;
+
+  setStatus(status2, '⏳ Subtitles load ho rahi hain...');
+  document.getElementById('downloadBtn').disabled = true;
+  preview.style.display = 'none';
+
+  try{
+    let capUrl = `https://video.google.com/timedtext?lang=${encodeURIComponent(track.lang)}&v=${currentVideoId}`;
+    if(track.kind === 'asr') capUrl += '&kind=asr';
+
+    const xml = await fetchViaProxies(capUrl);
+    const cues = parseCaptionsXml(xml);
+
+    if(cues.length === 0){
+      setStatus(status2, 'Is language ki subtitles khaali aayi, doosri language try karo.', true);
+      document.getElementById('downloadBtn').disabled = false;
+      return;
+    }
+
+    const content = activeFmt === 'srt' ? toSRT(cues) : toTXT(cues);
+    const ext = activeFmt === 'srt' ? 'srt' : 'txt';
+    const blob = new Blob([content], {type:'text/plain;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${currentVideoId}_${track.lang}.${ext}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    preview.style.display = 'block';
+    preview.textContent = content.slice(0, 1200) + (content.length > 1200 ? '\n...' : '');
+    setStatus(status2, `✔ Download shuru ho gaya (${cues.length} lines).`);
+  }catch(e){
+    setStatus(status2, 'Load fail ho gaya — thodi der baad phir try karo.', true);
+  }finally{
+    document.getElementById('downloadBtn').disabled = false;
+  }
+});
+
+document.getElementById('ytUrl').addEventListener('keydown', (e) => {
+  if(e.key === 'Enter') document.getElementById('fetchBtn').click();
+});
+</script>
+</body>
+</html>
