@@ -59,12 +59,17 @@ function extractVideoId(url) {
   if (!url) return null;
   url = url.trim();
 
-  // Already an ID
+  // Already a video ID
   if (/^[a-zA-Z0-9_-]{11}$/.test(url)) return url;
 
-  // Standard patterns
   const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
+    // Normal watch
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/,
+    // Shorts
+    /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
+    // Live streams
+    /youtube\.com\/live\/([a-zA-Z0-9_-]{11})/,
+    // Fallback query param
     /[?&]v=([a-zA-Z0-9_-]{11})/
   ];
 
