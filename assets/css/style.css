@@ -181,3 +181,4 @@ button.btn.secondary{background:#F0F0EC;color:var(--ink);}
   .hero h1{font-size:30px;}
   .grid-2{grid-template-columns:1fr;}
 }
+sidebar-logo { height: 32px; width: auto; }
